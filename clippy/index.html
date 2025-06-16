@@ -241,7 +241,7 @@
         break;
     }
 
-    let rawSplit = text.split(delimiter);
+    let rawSplit = text.split(delimiter).filter(item => item.trim() !== '');
     if (delimType !== 'linebreak' && delimType !== 'space') {
       rawSplit = rawSplit.map((val, i, arr) => {
         if (i < arr.length - 1) return val + getDelimiterString(delimType);

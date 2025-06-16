@@ -7,10 +7,35 @@
     body {
       font-family: Verdana, Geneva, sans-serif;
       margin: 20px;
+      background-image: url('https://img.freepik.com/premium-vector/cute-colorful-rainbow-background-perfect-wallpaper-backdrop-postcard-background_565280-389.jpg?semt=ais_hybrid&w=740');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      color: #333; /* Dark text to contrast the light background */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 2px rgba(255,255,255,0.9);
+    }
+
     .container {
       display: flex;
       gap: 20px;
+      width: 100%;
+      max-width: 1200px;
+      flex-grow: 1;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
     }
     .column.left,
     .column.right {
@@ -27,6 +52,10 @@
       padding: 10px;
       font-size: 14px;
       box-sizing: border-box;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      font-family: monospace;
     }
     select, input[type="text"], button {
       width: 100%;
@@ -34,6 +63,17 @@
       margin-top: 10px;
       font-family: Verdana, Geneva, sans-serif;
       box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid #aaa;
+      font-size: 14px;
+    }
+    button {
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #005500;
+      color: white;
     }
     .transform-pair {
       margin-bottom: 15px;
@@ -55,7 +95,6 @@
       color: white;
       font-weight: bold;
       border: none;
-      cursor: pointer;
     }
     .hidden {
       display: none;
@@ -64,41 +103,43 @@
 </head>
 <body>
 
-<div class="container">
-  <!-- Left Column -->
-  <div class="column left">
-    <div class="inline">
-      <label for="inputDelimiter">Delimiter:</label>
-      <select id="inputDelimiter">
-        <option value="space">Space</option>
-        <option value="linebreak">Line break</option>
-        <option value="comma">Comma ,</option>
-        <option value="colon">Colon :</option>
-        <option value="semicolon">Semicolon ;</option>
-        <option value="other">Other</option>
-      </select>
-      <input type="text" id="customInputDelimiter" placeholder="Custom delimiter" class="hidden" style="width: 150px;" />
-    </div>
-    <textarea id="inputBox" placeholder="Paste your text here..."></textarea>
-  </div>
+  <h1>Naoko Presents: CLIPPY!! 📎📎📎</h1>
 
-  <!-- Middle Column -->
-  <div class="column middle" id="transformControls">
-    <div id="transformList"></div>
-
-    <div class="btn-row">
-      <button onclick="removeTransform()">-</button>
-      <button onclick="addTransform()">+</button>
+  <div class="container">
+    <!-- Left Column -->
+    <div class="column left">
+      <div class="inline">
+        <label for="inputDelimiter">Delimiter:</label>
+        <select id="inputDelimiter">
+          <option value="linebreak">Line break</option>
+          <option value="comma">Comma ,</option>
+          <option value="space">Space</option>
+          <option value="colon">Colon :</option>
+          <option value="semicolon">Semicolon ;</option>
+          <option value="other">Other</option>
+        </select>
+        <input type="text" id="customInputDelimiter" placeholder="Custom delimiter" class="hidden" style="width: 150px;" />
+      </div>
+      <textarea id="inputBox" placeholder="Paste your text here..."></textarea>
     </div>
 
-    <button id="goButton" onclick="processText()">GO CLIPPY!</button>
-  </div>
+    <!-- Middle Column -->
+    <div class="column middle" id="transformControls">
+      <div id="transformList"></div>
 
-  <!-- Right Column -->
-  <div class="column right">
-    <textarea id="outputBox" placeholder="Output will appear here..."></textarea>
+      <div class="btn-row">
+        <button onclick="removeTransform()">-</button>
+        <button onclick="addTransform()">+</button>
+      </div>
+
+      <button id="goButton" onclick="processText()">GO CLIPPY!</button>
+    </div>
+
+    <!-- Right Column -->
+    <div class="column right">
+      <textarea id="outputBox" placeholder="Output will appear here..."></textarea>
+    </div>
   </div>
-</div>
 
 <script>
   let transformCount = 0;
@@ -183,30 +224,31 @@
   });
 
   function getInputValues() {
-  const text = document.getElementById('inputBox').value;
-  const delimType = document.getElementById('inputDelimiter').value;
-  let delimiter;
+    const text = document.getElementById('inputBox').value;
+    const delimType = document.getElementById('inputDelimiter').value;
+    let delimiter;
 
-  switch (delimType) {
-    case 'space': delimiter = /\s+/; break;
-    case 'linebreak': delimiter = /\n+/; break;
-    case 'comma': delimiter = /,+/; break;
-    case 'colon': delimiter = /:+/; break;
-    case 'semicolon': delimiter = /;+/; break;
-    case 'other':
-      delimiter = document.getElementById('customInputDelimiter').value;
-      delimiter = new RegExp(delimiter, 'g');
-      break;
+    switch (delimType) {
+      case 'space': delimiter = /\s+/; break;
+      case 'linebreak': delimiter = /\n+/; break;
+      case 'comma': delimiter = /,+/; break;
+      case 'colon': delimiter = /:+/; break;
+      case 'semicolon': delimiter = /;+/; break;
+      case 'other':
+        delimiter = document.getElementById('customInputDelimiter').value;
+        delimiter = new RegExp(delimiter, 'g');
+        break;
+    }
+
+    let rawSplit = text.split(delimiter);
+    if (delimType !== 'linebreak' && delimType !== 'space') {
+      rawSplit = rawSplit.map((val, i, arr) => {
+        if (i < arr.length - 1) return val + getDelimiterString(delimType);
+        return val;
+      });
+    }
+    return rawSplit;
   }
-
-  // Split text cleanly by delimiter, no delimiter kept in parts
-  let rawSplit = text.split(delimiter);
-
-  // Remove empty entries (in case of trailing delimiter)
-  rawSplit = rawSplit.filter(val => val.trim() !== '');
-
-  return rawSplit;
-}
 
   function getDelimiterString(type) {
     switch (type) {
@@ -219,79 +261,53 @@
   }
 
   function processText() {
-  let values = getInputValues();
+    let values = getInputValues();
+    const steps = document.querySelectorAll('.transform-pair');
+    let finalAction = '';
+    let joinDelimiter = ''; // Default: no spaces between joined items
 
-  // Determine original delimiter string for final join
-  const inputDelimType = document.getElementById('inputDelimiter').value;
-  let originalDelim = ',';
-  switch(inputDelimType) {
-    case 'space': originalDelim = ' '; break;
-    case 'linebreak': originalDelim = '\n'; break;
-    case 'comma': originalDelim = ','; break;
-    case 'colon': originalDelim = ':'; break;
-    case 'semicolon': originalDelim = ';'; break;
-    case 'other': 
-      originalDelim = document.getElementById('customInputDelimiter').value || ','; 
-      break;
-    default: originalDelim = ',';
-  }
+    steps.forEach(step => {
+      const action = step.querySelector('.action').value;
+      const delimiterSelect = step.querySelector('.delimiter');
+      const customInput = step.querySelector('.custom-delim');
+      let delimiter = '';
 
-  const steps = document.querySelectorAll('.transform-pair');
-  let finalAction = '';
-
-  steps.forEach(step => {
-    const action = step.querySelector('.action').value;
-    const delimiterSelect = step.querySelector('.delimiter');
-    const customInput = step.querySelector('.custom-delim');
-    let delimiter = '';
-
-    if (action === 'separate') {
-      finalAction = 'separate'; // handle at the end
-      return;
-    }
-
-    if (delimiterSelect) {
-      const type = delimiterSelect.value;
-      switch (type) {
-        case 'quotes': delimiter = '"'; break;
-        case 'comma': delimiter = ','; break;
-        case 'semicolon': delimiter = ';'; break;
-        case 'colon': delimiter = ':'; break;
-        case 'other': delimiter = customInput.value; break;
-        case 'space': delimiter = ' '; break;
-        case 'separate line': delimiter = '\n'; break;
+      if (action === 'separate') {
+        finalAction = 'separate'; // we'll handle this at the end
+        return;
       }
-    }
 
-    if (action === 'add') {
-      if (delimiterSelect.value === 'quotes') {
-        // Wrap each value in quotes; join with original delimiter
-        values = values.map(val => `"${val}"`);
-      } else {
-        // Add the chosen string before the delimiter (which join will add)
-        let addString = '';
-        switch (delimiterSelect.value) {
-          case 'comma': addString = ','; break;
-          case 'semicolon': addString = ';'; break;
-          case 'colon': addString = ':'; break;
-          case 'space': addString = ' '; break;
-          case 'separate line': addString = '\n'; break;
-          case 'other': addString = customInput.value; break;
-          default: addString = '';
+      if (delimiterSelect) {
+        const type = delimiterSelect.value;
+        switch (type) {
+          case 'quotes': delimiter = '"'; break;
+          case 'comma': delimiter = ','; break;
+          case 'semicolon': delimiter = ';'; break;
+          case 'colon': delimiter = ':'; break;
+          case 'other': delimiter = customInput.value; break;
+          case 'space': delimiter = ' '; break;
+          case 'separate line': delimiter = '\n'; break;
         }
-        values = values.map(val => val + addString);
       }
-    } else if (action === 'remove') {
-      // Remove the delimiter characters from each value
-      const escaped = delimiter.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
-      const regex = new RegExp(escaped, 'g');
-      values = values.map(val => val.replace(regex, ''));
-    }
-  });
 
-  const output = (finalAction === 'separate') ? values.join('\n') : values.join(originalDelim);
-  document.getElementById('outputBox').value = output;
-}
+      if (action === 'add') {
+        values = values.map(val => {
+          if (delimiterSelect.value === 'quotes') {
+            return `"${val}"`;
+          } else {
+            return val + delimiter;
+          }
+        });
+      } else if (action === 'remove') {
+        const escaped = delimiter.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
+        const regex = new RegExp(escaped, 'g');
+        values = values.map(val => val.replace(regex, ''));
+      }
+    });
+
+    const output = (finalAction === 'separate') ? values.join('\n') : values.join(joinDelimiter);
+    document.getElementById('outputBox').value = output;
+  }
 </script>
 
 </body>

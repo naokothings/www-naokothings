@@ -28,7 +28,6 @@
       text-shadow: 1px 1px 2px rgba(255,255,255,0.9);
     }
 
-    /* Settings in Top Right of Page */
     .page-settings {
       position: fixed;
       top: 20px;
@@ -69,8 +68,7 @@
       box-shadow: 0 8px 16px rgba(0,0,0,0.15);
     }
 
-    .column.left,
-    .column.right {
+    .column.left, .column.right {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -240,7 +238,6 @@
     document.getElementById('settingsMenu').classList.toggle('hidden');
   }
 
-  // Close settings if clicking outside
   window.onclick = function(event) {
     if (!event.target.matches('#settingsBtn') && !event.target.closest('#settingsMenu')) {
       document.getElementById('settingsMenu').classList.add('hidden');
@@ -336,7 +333,7 @@
         case 'semicolon': delimiter = /;+/; break;
       }
     }
-    return text.split(delimiter).filter(item => item.trim() !== '');
+    return text.split(delimiter).map(item => item.trim()).filter(item => item !== '');
   }
 
   function updateInputCount() {
@@ -349,7 +346,7 @@
   function processText() {
     let values = getInputValues();
     const steps = document.querySelectorAll('.transform-pair');
-    let finalAction = '';
+    let useLineBreaks = false;
 
     steps.forEach(step => {
       const action = step.querySelector('.action').value;
@@ -357,7 +354,10 @@
       const customVal = step.querySelector('.custom-delim').value;
       let char = '';
 
-      if (action === 'separate') { finalAction = 'separate'; return; }
+      if (action === 'separate') { 
+        useLineBreaks = true; 
+        return; 
+      }
 
       switch (delimType) {
         case 'quotes': char = '"'; break;
@@ -381,7 +381,8 @@
       values = [...new Set(values)];
     }
 
-    document.getElementById('outputBox').value = (finalAction === 'separate') ? values.join('\n') : values.join('');
+    // Join with new lines if 'separate' was used, otherwise join into one string
+    document.getElementById('outputBox').value = useLineBreaks ? values.join('\n') : values.join('');
     document.getElementById('outputCount').innerText = `Count: ${values.length}`;
   }
 

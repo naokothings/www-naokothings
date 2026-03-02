@@ -28,14 +28,10 @@
       text-shadow: 1px 1px 2px rgba(255,255,255,0.9);
     }
 
-    .page-settings {
+    /* Top Navigation Buttons (Home and Settings) */
+    .nav-btn {
       position: fixed;
       top: 20px;
-      right: 20px;
-      z-index: 100;
-      text-align: right;
-    }
-    #settingsBtn {
       background: rgba(255, 255, 255, 0.8);
       border: 1px solid #ccc;
       border-radius: 50%;
@@ -44,14 +40,25 @@
       font-size: 20px;
       cursor: pointer;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      z-index: 100;
+      transition: all 0.2s ease;
     }
+    .nav-btn:hover { background: white; transform: scale(1.1); }
+
+    .home-link { left: 20px; }
+    .settings-wrapper { right: 20px; position: fixed; top: 20px; }
+    
     .settings-menu {
       background: white;
       border: 1px solid #ccc;
       padding: 15px;
       border-radius: 8px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      margin-top: 10px;
+      margin-top: 50px; /* Space below the gear icon */
       min-width: 180px;
       text-align: left;
     }
@@ -188,8 +195,10 @@
 </head>
 <body>
 
-  <div class="page-settings">
-    <button id="settingsBtn" onclick="toggleSettings()" title="Settings">⚙️</button>
+  <a href="https://www.justnaokothings.com" class="nav-btn home-link" title="Home">🏠</a>
+
+  <div class="settings-wrapper">
+    <button id="settingsBtn" class="nav-btn" onclick="toggleSettings()" title="Settings" style="position: static;">⚙️</button>
     <div id="settingsMenu" class="settings-menu hidden">
       <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
         <input type="checkbox" id="dedupeCheckbox" checked onchange="processText()"> 
@@ -381,7 +390,6 @@
       values = [...new Set(values)];
     }
 
-    // Join with new lines if 'separate' was used, otherwise join into one string
     document.getElementById('outputBox').value = useLineBreaks ? values.join('\n') : values.join('');
     document.getElementById('outputCount').innerText = `Count: ${values.length}`;
   }

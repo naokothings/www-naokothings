@@ -883,8 +883,13 @@ function renderLastSessionPanel(){
     return;
   }
 
-  lastSessionSummaryEl.textContent =
-    `Correct ${lastSession.correct} • Incorrect ${lastSession.incorrect} • Total ${lastSession.total} • ${lastSession.pct}% correct • Weak threshold: ≥${lastSession.minAttempts} attempts + ≥50% missed`;
+  lastSessionSummaryEl.innerHTML = `
+  <div>Correct: ${lastSession.correct}</div>
+  <div>Incorrect: ${lastSession.incorrect}</div>
+  <div>Total: ${lastSession.total}</div>
+  <div>Percentage: ${lastSession.pct}%</div>
+  <div>Weak threshold: ≥${lastSession.minAttempts} attempts + ≥50% missed</div>
+`;
 
   const weak = Array.isArray(lastSession.weak) ? lastSession.weak : [];
   if (weak.length === 0){

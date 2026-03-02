@@ -9,14 +9,11 @@
 
     <style>
         body {
-            /* Background image configuration */
             background-image: url('index_files/background.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
-            
-            /* Fallback color if image fails to load */
             background-color: #FFECBC; 
             
             font-family: "Avenir Book", "Aptos", sans-serif;
@@ -24,57 +21,69 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            padding-top: 50px;
+            padding: 50px 20px;
             min-height: 100vh;
         }
 
         h1 {
             font-size: 48pt;
-            font-weight: normal;
+            margin: 0 0 5px 0;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Smaller, normal-sized subtitle */
+        .subtitle {
+            text-align: center;
+            font-size: 1.1rem; /* Standard text size */
+            line-height: 1.5;
             margin-bottom: 40px;
-            /* Added a slight text shadow to help it pop against a background image */
-            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+            color: #333;
         }
 
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 25px;
+        /* Styling only the specific clickable part */
+        .audio-link {
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: underline dotted;
+        }
+        
+        .audio-link:hover {
+            color: #d35400;
         }
 
-        .top-row {
+        .gallery {
             display: flex;
-            gap: 20px;
+            flex-wrap: wrap;
             justify-content: center;
+            gap: 25px;
+            max-width: 1200px;
         }
 
-        /* Top Row Images (285px) */
-        .top-row img {
-            display: block;
-            height: 285px; 
-            width: auto;
-        }
-
-        /* Katakana Image (250px with shadow and rounded corners) */
-        .katakana-img {
-            display: block;
-            height: 250px; 
-            width: auto;
-            border-radius: 20px;
-            box-shadow: -10px 10px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        a {
+        .tile {
             text-decoration: none;
-            transition: transform 0.2s;
             display: block;
+            transition: transform 0.2s ease;
         }
 
-        /* Subtle hover effect for the links */
-        a:hover {
-            transform: scale(1.02);
+        .tile:hover {
+            transform: translateY(-5px);
+        }
+
+        .tile:active {
+            transform: scale(0.95); /* The "Squish" */
+        }
+
+        .tile img {
+            height: 250px;
+            width: auto;
+            display: block;
+            border-radius: 20px; /* Applying rounding to all for consistency */
+        }
+
+        /* Keeping your specific 250px height for Katakana */
+        .katakana-img {
+            height: 250px !important; 
+            box-shadow: -10px 10px 20px rgba(0, 0, 0, 0.3);
         }
     </style>
 </head>
@@ -82,22 +91,35 @@
 
     <h1>Just Naoko Things</h1>
 
-    <div class="container">
-        <div class="top-row">
-            <a href="http://www.instagram.com/carrotthedoggie">
-                <img src="index_files/carrot_thumbnail.png" alt="A dog lying in the sand">
-            </a>
-            <a href="http://www.justnaokothings.com/clippy/">
-                <img src="index_files/clippy_thumbnail.png" alt="Clippy">
-            </a>
-        </div>
-
-        <div class="bottom-row">
-            <a href="http://www.justnaokothings.com/katakana">
-                <img src="index_files/katakana_thumbnail.png" alt="katakana" class="katakana-img">
-            </a>
-        </div>
+    <div class="subtitle">
+        It's pronounced <span class="audio-link" onclick="playAudio()">NOW*ko 🔈</span><br>
+        Don't panic. You got this.
     </div>
+
+    <audio id="naokoAudio">
+        <source src="index_files/naokopronunciation.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="gallery">
+        <a href="http://www.instagram.com/carrotthedoggie" class="tile">
+            <img src="index_files/carrot_thumbnail.png" alt="Carrot the dog">
+        </a>
+
+        <a href="http://www.justnaokothings.com/clippy/" class="tile">
+            <img src="index_files/clippy_thumbnail.png" alt="Clippy">
+        </a>
+
+        <a href="http://www.justnaokothings.com/katakana" class="tile">
+            <img src="index_files/katakana_thumbnail.png" alt="katakana" class="katakana-img">
+        </a>
+    </div>
+
+    <script>
+        function playAudio() {
+            var audio = document.getElementById("naokoAudio");
+            audio.play();
+        }
+    </script>
 
 </body>
 </html>

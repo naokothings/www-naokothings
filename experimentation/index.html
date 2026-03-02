@@ -1,0 +1,1093 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇯🇵</text></svg>">
+  <title>Katakana Chart & Flashcards 🇯🇵</title>
+  <style>
+    :root{
+      --bg:#fafafa;
+      --panel:#fff;
+      --border:#e6e6e6;
+      --text:#111;
+      --muted:#555;
+      --pill:#f3f3f3;
+      --green:#1f8a4c;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      padding:20px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    h1{ margin:0 0 12px; font-size:22px; }
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:14px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .small{ font-size:12px; color:var(--muted); }
+    .btn{
+      border:1px solid #ddd;
+      background:#fff;
+      border-radius:10px;
+      padding:8px 10px;
+      cursor:pointer;
+    }
+    .btn:hover{ background:#21ba16; }
+    .btn:disabled{ opacity:.5; cursor:not-allowed; }
+    .btn-green{
+      border-color: transparent;
+      background: var(--green);
+      color:#fff;
+      font-weight:600;
+      padding:10px 14px;
+      border-radius:12px;
+    }
+    .btn-green:hover{ filter: brightness(.95); }
+    .btn-link{
+      border:none;
+      background:transparent;
+      padding:6px 8px;
+      cursor:pointer;
+      color:#0b57d0;
+      text-decoration: underline;
+    }
+    .pill{
+      background:var(--pill);
+      border:1px solid #eee;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      color:#222;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      white-space:nowrap;
+    }
+    .divider{ height:1px; background:#eee; margin:12px 0; }
+
+    /* Selection screen layout */
+    .select-wrap{
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:16px;
+      align-items:start;
+    }
+
+    /* Rotated grid (90° clockwise) with vowel row headers on RIGHT */
+    .grid{
+      display:grid;
+      gap:6px;
+      /* 11 chart columns + 1 right-side header column */
+      grid-template-columns: repeat(11, 1fr) 56px;
+      align-items:stretch;
+      user-select:none;
+    }
+    .hdr, .rowhdr{
+      font-weight:700;
+      text-align:center;
+      padding:10px 0;
+      border-radius:10px;
+      border:1px solid #eee;
+      background:#a6a6a6;
+      cursor:pointer;
+    }
+    .hdr:hover, .rowhdr:hover{ background:#f0f0f0; }
+    .hdr.active, .rowhdr.active{
+      background:#111;
+      color:#fff;
+      border-color:#111;
+    }
+    .hdr.hover, .rowhdr.hover{
+      outline:2px solid #111;
+      outline-offset:0;
+    }
+    .corner{
+      font-weight:700;
+      text-align:center;
+      padding:10px 0;
+      border-radius:10px;
+      border:1px solid #eee;
+      background:#f6f6f6;
+      cursor:default;
+    }
+
+    .cell{
+      min-height:60px;
+      border:1px solid #eee;
+      border-radius:12px;
+      background:#fff;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      transition: transform .03s ease, background .12s ease, border-color .12s ease;
+      padding:6px 4px;
+    }
+    .cell:active{ transform: scale(.99); }
+    .cell.empty{
+      background:#fafafa;
+      border-style:dashed;
+      cursor:default;
+      color:#aaa;
+    }
+    .cell.selected{
+      background:#111;
+      color:#fff;
+      border-color:#111;
+    }
+    .cell.hl{
+      outline:2px solid rgba(17,17,17,.25);
+      outline-offset:0;
+    }
+    .kana{ font-size:22px; line-height:1; }
+    .romaji{ font-size:11px; opacity:.8; margin-top:4px; }
+
+    /* Side panel */
+    .side{ display:grid; gap:12px; }
+    .msg{ font-size:13px; margin-top:8px; min-height:18px; }
+    .msg.bad{ color:#b00020; }
+    .msg.ok{ color:#0a7a2f; }
+
+    /* Flashcard screen */
+    .hidden{ display:none !important; }
+
+    .flash-wrap{
+      display:grid;
+      gap:14px;
+      max-width:720px;
+      margin:0 auto;
+    }
+    .statsbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      align-items:center;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid #eee;
+      background:#fff;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    .big{
+      font-size:72px;
+      text-align:center;
+      padding:18px 0 6px;
+    }
+    .status{
+      min-height:20px;
+      font-size:14px;
+      text-align:center;
+    }
+    .status.ok{ color:#0a7a2f; }
+    .status.bad{ color:#b00020; }
+
+    /* INPUT: smaller + centered under character */
+    .inputwrap{
+      display:flex;
+      justify-content:center;
+      margin-top:6px;
+    }
+    input[type="text"]{
+      width:100%;
+      max-width:320px;
+      padding:9px 12px;
+      border:1px solid #ddd;
+      border-radius:12px;
+      font-size:15px;
+      text-align:center;
+    }
+
+    .endbar{
+      display:flex;
+      justify-content:center;
+      padding-top:10px;
+    }
+    .btn-end{
+      border:1px solid #ddd;
+      background:#fff;
+      border-radius:12px;
+      padding:10px 16px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .btn-end:hover{ background:#f4f4f4; }
+
+    /* Settings */
+    .settings{
+      margin-top:8px;
+      padding:10px;
+      border:1px dashed #ddd;
+      border-radius:12px;
+      background:#fcfcfc;
+      display:none;
+    }
+    .settings.show{ display:block; }
+    label{ display:inline-flex; gap:8px; align-items:center; cursor:pointer; }
+  
+    /* ============================
+       FUN MODE (Crayola Theme)
+       Applies ONLY to selection screen
+       ============================ */
+
+    #selectionScreen.fun-mode .hdr {
+      color: #fff;
+      border-color: transparent;
+    }
+
+    /* Header colors by UI column index (0..10). 0 is the ∅ vowel column, 1 is ン. */
+    #selectionScreen.fun-mode .hdr[data-col="0"] { background:#ED0A3F; } /* Red */
+    #selectionScreen.fun-mode .hdr[data-col="1"] { background:#6E2EB5; } /* Purple (ン) */
+    #selectionScreen.fun-mode .hdr[data-col="2"] { background:#8A2BE2; } /* Violet */
+    #selectionScreen.fun-mode .hdr[data-col="3"] { background:#FF7538; } /* Orange */
+    #selectionScreen.fun-mode .hdr[data-col="4"] { background:#FCE883; color:#111; } /* Yellow */
+    #selectionScreen.fun-mode .hdr[data-col="5"] { background:#1CAC78; } /* Green */
+    #selectionScreen.fun-mode .hdr[data-col="6"] { background:#00B0B8; } /* Teal */
+    #selectionScreen.fun-mode .hdr[data-col="7"] { background:#1F75FE; } /* Blue */
+    #selectionScreen.fun-mode .hdr[data-col="8"] { background:#4B0082; } /* Indigo */
+    #selectionScreen.fun-mode .hdr[data-col="9"] { background:#FF6EFF; } /* Magenta */
+    #selectionScreen.fun-mode .hdr[data-col="10"] { background:#FF5349; } /* Scarlet */
+
+    /* Pastel selection highlight by column */
+    #selectionScreen.fun-mode .cell.selected[data-col="0"]  { background:#FFD6DC; border-color:#ED0A3F; color:#111; }
+    #selectionScreen.fun-mode .cell.selected[data-col="1"]  { background:#E7D7FF; border-color:#6E2EB5; color:#111; }
+    #selectionScreen.fun-mode .cell.selected[data-col="2"]  { background:#EADCF4; border-color:#8A2BE2; color:#111; }
+    #selectionScreen.fun-mode .cell.selected[data-col="3"]  { background:#FFE3D3; border-color:#FF7538; color:#111; }
+    #selectionScreen.fun-mode .cell.selected[data-col="4"]  { background:#FFF7C2; border-color:#FCE883; color:#111; }
+    #selectionScreen.fun-mode .cell.selected[data-col="5"]  { background:#D8F3E6; border-color:#1CAC78; color:#111; }
+    #selectionScreen.fun-mode .cell.selected[data-col="6"]  { background:#D6F4F6; border-color:#00B0B8; color:#111; }
+    #selectionScreen.fun-mode .cell.selected[data-col="7"]  { background:#DCEBFF; border-color:#1F75FE; color:#111; }
+    #selectionScreen.fun-mode .cell.selected[data-col="8"]  { background:#E6D6F2; border-color:#4B0082; color:#111; }
+    #selectionScreen.fun-mode .cell.selected[data-col="9"]  { background:#FFDDF7; border-color:#FF6EFF; color:#111; }
+    #selectionScreen.fun-mode .cell.selected[data-col="10"] { background:#FFDAD6; border-color:#FF5349; color:#111; }
+
+  </style>
+</head>
+
+<body>
+  <h1>Katakana Chart → Flashcards</h1>
+
+  <!-- SELECTION SCREEN -->
+  <div id="selectionScreen" class="select-wrap">
+    <div class="panel">
+      <div class="row" style="justify-content:space-between;">
+        <div class="row" style="gap:8px;">
+          <button class="btn" id="selectAll">Select all</button>
+          <button class="btn" id="clearAll">Clear</button>
+        </div>
+
+        <div class="row" style="gap:8px;">
+          <button class="btn btn-link" id="settingsLink" type="button">Settings</button>
+          <button class="btn btn-green" id="startBtn" type="button">START</button>
+        </div>
+      </div>
+
+      <div id="settingsPanel" class="settings">
+        <div class="small" style="margin-bottom:8px;">Answer checking</div>
+        <label class="small">
+          <input type="checkbox" id="strictMode" checked />
+          Strict Hepburn only (recommended)
+        </label>
+        <label class="small" style="margin-top:10px;">
+          <input type="checkbox" id="funModeToggle" />
+          Crayola mode 🌈
+        </label>
+        <div class="small" style="margin-top:8px;">
+          In non-strict mode, the app accepts common alternate spellings (e.g., si for shi) but still shows Hepburn as the “answer.”
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="small">
+        Click any header to select/unselect the whole row/column. Click individual characters to toggle.
+      </div>
+
+      <div id="chart" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="panel side">
+      <div>
+        <div class="row" style="justify-content:space-between;">
+          <div class="pill">Selected: <b id="selectedCount">0</b></div>
+          <div class="pill">Deck size: <b id="deckSizePreview">0</b></div>
+        </div>
+        <div id="selectMsg" class="msg"></div>
+      </div>
+
+      <div>
+        <div style="font-weight:700; margin-bottom:6px;">Last session</div>
+        <div id="lastSessionSummary" class="small">No session yet.</div>
+        <div id="weakList" class="small" style="margin-top:8px;"></div>
+        <div class="row" style="margin-top:10px;">
+          <button class="btn" id="selectWeakBtn" type="button" disabled>Select weak characters</button>
+          <span class="small">Tip: press <b>Clear</b> first to practice only weak characters.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLASHCARD SCREEN -->
+  <div id="flashScreen" class="hidden">
+    <div class="flash-wrap">
+      <div class="statsbar">
+        <div class="pill">Correct: <b id="statCorrect">0</b></div>
+        <div class="pill">Incorrect: <b id="statIncorrect">0</b></div>
+        <div class="pill">Total: <b id="statTotal">0</b></div>
+        <div class="pill">% Correct: <b id="statPct">0%</b></div>
+      </div>
+
+      <div class="panel">
+        <div class="row" style="justify-content:space-between; margin-bottom:6px;">
+          <div class="small">In deck: <b id="inDeck">0</b></div>
+          <div class="row" style="gap:8px;">
+            <button class="btn" id="shuffleBtn" type="button">Shuffle</button>
+            <button class="btn" id="skipBtn" type="button">Skip</button>
+          </div>
+        </div>
+
+        <div id="bigKana" class="big">—</div>
+
+        <div class="inputwrap">
+          <input id="answerInput" type="text" placeholder="Type romaji and press Enter"
+            autocomplete="off" autocapitalize="none" spellcheck="false" />
+        </div>
+
+        <div id="status" class="status"></div>
+      </div>
+
+      <div class="endbar">
+        <button class="btn-end" id="endBtn" type="button">END</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/** ----------------------------
+ *  Data (Katakana gojūon basics)
+ *  Primary answer is Hepburn.
+ *  Alternate spellings accepted ONLY when strict is OFF.
+ * -----------------------------*/
+const chartRows = [
+  { rowLabel: '',  cells: [ {k:'ア', a:['a']},{k:'イ', a:['i']},{k:'ウ', a:['u']},{k:'エ', a:['e']},{k:'オ', a:['o']} ] },
+  { rowLabel: 'K', cells: [ {k:'カ', a:['ka']},{k:'キ', a:['ki']},{k:'ク', a:['ku']},{k:'ケ', a:['ke']},{k:'コ', a:['ko']} ] },
+  { rowLabel: 'S', cells: [ {k:'サ', a:['sa']},{k:'シ', a:['shi','si']},{k:'ス', a:['su']},{k:'セ', a:['se']},{k:'ソ', a:['so']} ] },
+  { rowLabel: 'T', cells: [ {k:'タ', a:['ta']},{k:'チ', a:['chi','ti']},{k:'ツ', a:['tsu','tu']},{k:'テ', a:['te']},{k:'ト', a:['to']} ] },
+  { rowLabel: 'N', cells: [ {k:'ナ', a:['na']},{k:'ニ', a:['ni']},{k:'ヌ', a:['nu']},{k:'ネ', a:['ne']},{k:'ノ', a:['no']} ] },
+  { rowLabel: 'H', cells: [ {k:'ハ', a:['ha']},{k:'ヒ', a:['hi']},{k:'フ', a:['fu','hu']},{k:'ヘ', a:['he']},{k:'ホ', a:['ho']} ] },
+  { rowLabel: 'M', cells: [ {k:'マ', a:['ma']},{k:'ミ', a:['mi']},{k:'ム', a:['mu']},{k:'メ', a:['me']},{k:'モ', a:['mo']} ] },
+  { rowLabel: 'Y', cells: [ {k:'ヤ', a:['ya']}, null, {k:'ユ', a:['yu']}, null, {k:'ヨ', a:['yo']} ] },
+  { rowLabel: 'R', cells: [ {k:'ラ', a:['ra']},{k:'リ', a:['ri']},{k:'ル', a:['ru']},{k:'レ', a:['re']},{k:'ロ', a:['ro']} ] },
+  { rowLabel: 'W', cells: [ {k:'ワ', a:['wa']}, null, null, null, {k:'ヲ', a:['wo','o']} ] },
+  { rowLabel: 'N*', cells: [ {k:'ン', a:['n']}, null, null, null, null ] },
+];
+
+// Rotation spec (90° clockwise):
+// UI columns are original rows (order places N* far left and vowels far right).
+const uiColumnOrder = ['N*','W','R','Y','M','H','N','T','S','K','']; // left -> right
+const uiRowLabels = ['A','I','U','E','O']; // top -> bottom maps to col indices 0..4
+
+// Storage keys
+const LS_SELECTION = 'katakana_selection_v1';
+const LS_LASTSESSION = 'katakana_last_session_v1';
+
+// DOM
+const chartEl = document.getElementById('chart');
+const selectedCountEl = document.getElementById('selectedCount');
+const deckSizePreviewEl = document.getElementById('deckSizePreview');
+const selectMsgEl = document.getElementById('selectMsg');
+
+const selectionScreen = document.getElementById('selectionScreen');
+const flashScreen = document.getElementById('flashScreen');
+
+const settingsLink = document.getElementById('settingsLink');
+const settingsPanel = document.getElementById('settingsPanel');
+const strictModeEl = document.getElementById('strictMode');
+
+const startBtn = document.getElementById('startBtn');
+const selectAllBtn = document.getElementById('selectAll');
+const clearAllBtn = document.getElementById('clearAll');
+
+const lastSessionSummaryEl = document.getElementById('lastSessionSummary');
+const weakListEl = document.getElementById('weakList');
+const selectWeakBtn = document.getElementById('selectWeakBtn');
+
+const statCorrectEl = document.getElementById('statCorrect');
+const statIncorrectEl = document.getElementById('statIncorrect');
+const statTotalEl = document.getElementById('statTotal');
+const statPctEl = document.getElementById('statPct');
+
+const inDeckEl = document.getElementById('inDeck');
+const bigKanaEl = document.getElementById('bigKana');
+const answerInput = document.getElementById('answerInput');
+const statusEl = document.getElementById('status');
+
+const shuffleBtn = document.getElementById('shuffleBtn');
+const skipBtn = document.getElementById('skipBtn');
+const endBtn = document.getElementById('endBtn');
+
+
+
+const funModeToggle = document.getElementById('funModeToggle');
+const LS_FUNMODE = 'katakana_fun_mode_v1';
+// State
+const selected = new Set(); // keys: "rIdx-cIdx"
+let hoverRow = null; // UI row index 0..4
+let hoverCol = null; // UI col index 0..(uiColumnOrder.length-1)
+
+// Flash state
+let baseDeck = [];  // immutable set for looping practice
+let deck = [];
+let current = null;
+let currentMissedThisCard = false;
+
+// Stats (session)
+let statCorrect = 0;
+let statIncorrect = 0;
+
+// Per-character stats (session)
+let perChar = {}; // key: "rIdx-cIdx" => { kana, primary, attempts, incorrect }
+
+// Timers / flow control
+let lockInput = false;
+let correctAdvanceTimeout = null;
+let incorrectTimeout = null;
+let canManualAdvance = false;
+
+// NOTE: you changed this earlier; keep it here for easy tweaking
+const CORRECT_ADVANCE_MS = 400;
+const INCORRECT_FEEDBACK_MS = 1000;
+
+let lastSession = null; // loaded from storage
+
+function normalize(s){
+  return (s || '').trim().toLowerCase().replace(/\s+/g,'');
+}
+
+function getRowByLabel(lbl){
+  return chartRows.find(r => r.rowLabel === lbl);
+}
+
+function getCellByKey(key){
+  const [r,c] = key.split('-').map(Number);
+  const row = chartRows[r];
+  const cell = row?.cells?.[c] || null;
+  return cell ? { rowIndex:r, colIndex:c, rowLabel: row.rowLabel, kana: cell.k, answers: cell.a } : null;
+}
+
+function allowedAnswersForCurrent(){
+  const strict = strictModeEl.checked;
+  return strict ? [current.answers[0]] : current.answers;
+}
+
+function saveSelection(){
+  localStorage.setItem(LS_SELECTION, JSON.stringify(Array.from(selected)));
+}
+
+function loadSelection(){
+  try{
+    const raw = localStorage.getItem(LS_SELECTION);
+    if (!raw) return;
+    const arr = JSON.parse(raw);
+    if (Array.isArray(arr)) arr.forEach(k => selected.add(k));
+  } catch {}
+}
+
+function saveLastSession(ls){
+  localStorage.setItem(LS_LASTSESSION, JSON.stringify(ls));
+}
+
+function loadLastSession(){
+  try{
+    const raw = localStorage.getItem(LS_LASTSESSION);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    return obj && typeof obj === 'object' ? obj : null;
+  } 
+  catch { return null; }
+}
+
+function safeGet(key){
+  try { return localStorage.getItem(key); }
+  catch { return null; }
+}
+
+function safeSet(key, value){
+  try { localStorage.setItem(key, value); }
+  catch { /* ignore */ }
+}
+
+function applyFunMode(on){
+  try{
+    if (on) selectionScreen.classList.add('fun-mode');
+    else selectionScreen.classList.remove('fun-mode');
+    safeSet(LS_FUNMODE, on ? '1' : '0');
+  } catch (e){
+    console.warn('applyFunMode failed', e);
+  }
+}
+
+function loadFunMode(){
+  // If the toggle isn't present, don't crash the whole app.
+  if (!funModeToggle) return;
+
+  const val = safeGet(LS_FUNMODE);
+  const isOn = val === '1';
+  funModeToggle.checked = isOn;
+  applyFunMode(isOn);
+}
+catch { return null; }
+}
+
+function shuffleInPlace(arr){
+  for (let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function buildDeckFromSelection(){
+  const items = [];
+  selected.forEach(key=>{
+    const cell = getCellByKey(key);
+    if (!cell) return;
+    items.push({
+      key,
+      kana: cell.kana,
+      answers: cell.answers
+    });
+  });
+  return items;
+}
+
+function updateSelectionCounts(){
+  selectedCountEl.textContent = selected.size;
+  deckSizePreviewEl.textContent = selected.size;
+}
+
+function isAllSelected(keys){
+  return keys.length > 0 && keys.every(k => selected.has(k));
+}
+
+function getKeysForUiColumn(uiColIndex){
+  const rowLabel = uiColumnOrder[uiColIndex];
+  const rowObj = getRowByLabel(rowLabel);
+  if (!rowObj) return [];
+  const rIdx = chartRows.indexOf(rowObj);
+  const keys = [];
+  for (let cIdx = 0; cIdx < 5; cIdx++){
+    if (rowObj.cells[cIdx]) keys.push(`${rIdx}-${cIdx}`);
+  }
+  return keys;
+}
+
+function getKeysForUiRow(uiRowIndex){
+  const cIdx = uiRowIndex;
+  const keys = [];
+  uiColumnOrder.forEach(lbl=>{
+    const rowObj = getRowByLabel(lbl);
+    if (!rowObj) return;
+    const rIdx = chartRows.indexOf(rowObj);
+    if (rowObj.cells[cIdx]) keys.push(`${rIdx}-${cIdx}`);
+  });
+  return keys;
+}
+
+function renderChart(){
+  chartEl.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+
+  // Top header row: 11 column headers + top-right corner blank
+  uiColumnOrder.forEach((lbl, uiColIdx)=>{
+    const h = document.createElement('div');
+    h.className = 'hdr';
+
+    
+
+    h.dataset.col = uiColIdx;
+const display = (lbl === 'N*') ? 'ン' : (lbl === '' ? '∅' : lbl);
+    h.textContent = display;
+
+    const colKeys = getKeysForUiColumn(uiColIdx);
+    if (isAllSelected(colKeys)) h.classList.add('active');
+    if (hoverCol === uiColIdx) h.classList.add('hover');
+
+    h.addEventListener('mouseenter', ()=>{
+      hoverCol = uiColIdx;
+      hoverRow = null;
+      renderChart();
+    });
+    h.addEventListener('mouseleave', ()=>{
+      hoverCol = null;
+      renderChart();
+    });
+
+    h.addEventListener('click', ()=>{
+      const all = isAllSelected(colKeys);
+      colKeys.forEach(k => all ? selected.delete(k) : selected.add(k));
+      saveSelection();
+      updateSelectionCounts();
+      renderChart();
+      selectMsgEl.textContent = '';
+      selectMsgEl.className = 'msg';
+    });
+
+    grid.appendChild(h);
+  });
+
+  const corner = document.createElement('div');
+  corner.className = 'corner';
+  corner.textContent = '';
+  grid.appendChild(corner);
+
+  // Body rows: 11 cells + vowel header on the RIGHT
+  uiRowLabels.forEach((vowelLbl, uiRowIdx)=>{
+    // Cells for each UI column
+    uiColumnOrder.forEach((rowLbl, uiColIdx)=>{
+      const rowObj = getRowByLabel(rowLbl);
+      const d = document.createElement('div');
+
+      if (!rowObj || !rowObj.cells[uiRowIdx]){
+        d.className = 'cell empty';
+        d.textContent = '—';
+        if (hoverRow === uiRowIdx || hoverCol === uiColIdx) d.classList.add('hl');
+        grid.appendChild(d);
+        return;
+      }
+
+      const rIdx = chartRows.indexOf(rowObj);
+      const key = `${rIdx}-${uiRowIdx}`;
+      const cell = rowObj.cells[uiRowIdx];
+
+      d.className = 'cell';
+      
+      d.dataset.col = uiColIdx;
+if (selected.has(key)) d.classList.add('selected');
+      if (hoverRow === uiRowIdx || hoverCol === uiColIdx) d.classList.add('hl');
+
+      d.innerHTML = `
+        <div style="text-align:center">
+          <div class="kana">${cell.k}</div>
+          <div class="romaji">${cell.a[0]}</div>
+        </div>
+      `;
+
+      d.addEventListener('click', ()=>{
+        if (selected.has(key)) selected.delete(key);
+        else selected.add(key);
+        saveSelection();
+        updateSelectionCounts();
+        renderChart();
+        selectMsgEl.textContent = '';
+        selectMsgEl.className = 'msg';
+      });
+
+      grid.appendChild(d);
+    });
+
+    // Right-side vowel row header
+    const rh = document.createElement('div');
+    rh.className = 'rowhdr';
+    rh.textContent = vowelLbl;
+
+    const rowKeys = getKeysForUiRow(uiRowIdx);
+    if (isAllSelected(rowKeys)) rh.classList.add('active');
+    if (hoverRow === uiRowIdx) rh.classList.add('hover');
+
+    rh.addEventListener('mouseenter', ()=>{
+      hoverRow = uiRowIdx;
+      hoverCol = null;
+      renderChart();
+    });
+    rh.addEventListener('mouseleave', ()=>{
+      hoverRow = null;
+      renderChart();
+    });
+
+    rh.addEventListener('click', ()=>{
+      const all = isAllSelected(rowKeys);
+      rowKeys.forEach(k => all ? selected.delete(k) : selected.add(k));
+      saveSelection();
+      updateSelectionCounts();
+      renderChart();
+      selectMsgEl.textContent = '';
+      selectMsgEl.className = 'msg';
+    });
+
+    grid.appendChild(rh);
+  });
+
+  chartEl.appendChild(grid);
+}
+
+function showSelectionScreen(){
+  flashScreen.classList.add('hidden');
+  selectionScreen.classList.remove('hidden');
+  updateSelectionCounts();
+  renderChart();
+  renderLastSessionPanel();
+}
+
+function showFlashScreen(){
+  selectionScreen.classList.add('hidden');
+  flashScreen.classList.remove('hidden');
+}
+
+function resetSessionStats(){
+  statCorrect = 0;
+  statIncorrect = 0;
+  perChar = {};
+  updateStatsBar();
+}
+
+function updateStatsBar(){
+  const total = statCorrect + statIncorrect;
+  const pct = total === 0 ? 0 : Math.round((statCorrect / total) * 100);
+  statCorrectEl.textContent = statCorrect;
+  statIncorrectEl.textContent = statIncorrect;
+  statTotalEl.textContent = total;
+  statPctEl.textContent = `${pct}%`;
+}
+
+function updateInDeck(){
+  const remaining = deck.length + (current ? 1 : 0);
+  inDeckEl.textContent = remaining;
+}
+
+function clearTimers(){
+  if (correctAdvanceTimeout) { clearTimeout(correctAdvanceTimeout); correctAdvanceTimeout = null; }
+  if (incorrectTimeout) { clearTimeout(incorrectTimeout); incorrectTimeout = null; }
+  canManualAdvance = false;
+}
+
+function setStatus(text, kind){
+  statusEl.textContent = text;
+  statusEl.className = 'status ' + (kind || '');
+}
+
+function focusAnswer(){
+  answerInput.focus();
+  answerInput.select();
+}
+
+function refillDeckIfNeeded(){
+  // Loop forever: if the working deck is empty, refill from baseDeck and reshuffle.
+  if (deck.length === 0 && baseDeck.length > 0){
+    deck = baseDeck.map(x => ({...x}));
+    shuffleInPlace(deck);
+  }
+}
+
+function drawNextCard(){
+  clearTimers();
+  lockInput = false;
+  answerInput.disabled = false;
+  answerInput.value = '';
+  setStatus('', '');
+  currentMissedThisCard = false;
+
+  refillDeckIfNeeded();
+
+  if (deck.length === 0){
+    current = null;
+    bigKanaEl.textContent = '—';
+    updateInDeck();
+    answerInput.disabled = true;
+    setStatus('No cards in deck. Press END to return.', 'bad');
+    return;
+  }
+
+  current = deck.shift();
+  bigKanaEl.textContent = current.kana;
+  updateInDeck();
+  focusAnswer();
+}
+
+function reinsertLater(card, offset){
+  const pos = Math.min(deck.length, Math.max(0, offset));
+  deck.splice(pos, 0, { ...card });
+}
+
+function ensurePerChar(key, kana, primary){
+  if (!perChar[key]) perChar[key] = { kana, primary, attempts: 0, incorrect: 0 };
+}
+
+function recordAttempt(key, kana, primary, wasIncorrect){
+  ensurePerChar(key, kana, primary);
+  perChar[key].attempts += 1;
+  if (wasIncorrect) perChar[key].incorrect += 1;
+}
+
+function submitAnswer(){
+  if (!current || lockInput) return;
+
+  // If we are in the "correct feedback window" and user presses Enter again, advance immediately.
+  if (canManualAdvance){
+    canManualAdvance = false;
+    if (correctAdvanceTimeout) { clearTimeout(correctAdvanceTimeout); correctAdvanceTimeout = null; }
+    advanceAfterCorrect();
+    return;
+  }
+
+  const user = normalize(answerInput.value);
+  if (!user) return;
+
+  const accepted = allowedAnswersForCurrent().map(normalize);
+  const ok = accepted.includes(user);
+
+  const primary = current.answers[0];
+  recordAttempt(current.key, current.kana, primary, !ok);
+
+  if (ok){
+    statCorrect += 1;
+    updateStatsBar();
+
+    setStatus('✅ Correct', 'ok');
+    lockInput = true;
+    answerInput.disabled = true;
+
+    canManualAdvance = true;
+    correctAdvanceTimeout = setTimeout(()=>{
+      canManualAdvance = false;
+      advanceAfterCorrect();
+    }, CORRECT_ADVANCE_MS);
+
+  } else {
+    statIncorrect += 1;
+    updateStatsBar();
+    currentMissedThisCard = true;
+
+    const shown = allowedAnswersForCurrent().join(' / ');
+    setStatus(`❌ Not quite. Accepted: ${shown}`, 'bad');
+
+    lockInput = true;
+    answerInput.disabled = true;
+
+    incorrectTimeout = setTimeout(()=>{
+      lockInput = false;
+      answerInput.disabled = false;
+      answerInput.value = '';
+      setStatus('', '');
+      focusAnswer();
+    }, INCORRECT_FEEDBACK_MS);
+  }
+}
+
+function advanceAfterCorrect(){
+  lockInput = false;
+  answerInput.disabled = false;
+
+  // If missed at least once on this card during this encounter, reinforce later.
+  if (currentMissedThisCard){
+    reinsertLater(current, 3);
+  }
+
+  drawNextCard();
+}
+
+function startSession(){
+  selectMsgEl.textContent = '';
+  selectMsgEl.className = 'msg';
+
+  if (selected.size === 0){
+    selectMsgEl.textContent = 'Select at least one character before starting.';
+    selectMsgEl.className = 'msg bad';
+    return;
+  }
+
+  baseDeck = buildDeckFromSelection();
+  deck = baseDeck.map(x => ({...x}));
+  shuffleInPlace(deck);
+
+  current = null;
+  resetSessionStats();
+  showFlashScreen();
+  drawNextCard();
+}
+
+function endSession(){
+  const total = statCorrect + statIncorrect;
+
+  const minAttempts = Math.max(2, Math.ceil(total * 0.1));
+  const weak = [];
+  for (const [key, s] of Object.entries(perChar)){
+    if (s.attempts >= minAttempts){
+      const missRate = s.incorrect / s.attempts;
+      if (missRate >= 0.5){
+        weak.push({
+          key,
+          kana: s.kana,
+          primary: s.primary,
+          attempts: s.attempts,
+          incorrect: s.incorrect,
+          missRate
+        });
+      }
+    }
+  }
+  weak.sort((a,b)=> (b.missRate - a.missRate) || (b.incorrect - a.incorrect) || (b.attempts - a.attempts));
+
+  lastSession = {
+    endedAt: new Date().toISOString(),
+    correct: statCorrect,
+    incorrect: statIncorrect,
+    total,
+    pct: total === 0 ? 0 : Math.round((statCorrect / total) * 100),
+    minAttempts,
+    weak
+  };
+  saveLastSession(lastSession);
+
+  clearTimers();
+  baseDeck = [];
+  deck = [];
+  current = null;
+  bigKanaEl.textContent = '—';
+  answerInput.value = '';
+  answerInput.disabled = false;
+  setStatus('', '');
+  showSelectionScreen();
+
+// Load theme LAST so it can't prevent rendering if it errors
+try { loadFunMode(); } catch (e) { console.warn('Fun mode load failed', e); }
+}
+
+function renderLastSessionPanel(){
+  lastSession = loadLastSession();
+
+  if (!lastSession || typeof lastSession.total !== 'number'){
+    lastSessionSummaryEl.textContent = 'No session yet.';
+    weakListEl.textContent = '';
+    selectWeakBtn.disabled = true;
+    return;
+  }
+
+  lastSessionSummaryEl.innerHTML = `
+  <div>Correct: ${lastSession.correct}</div>
+  <div>Incorrect: ${lastSession.incorrect}</div>
+  <div>Total: ${lastSession.total}</div>
+  <div>Percentage: ${lastSession.pct}%</div>
+  <div>
+  <div>Weak threshold: ≥${lastSession.minAttempts} attempts + ≥50% missed</div>
+`;
+
+  const weak = Array.isArray(lastSession.weak) ? lastSession.weak : [];
+  if (weak.length === 0){
+    weakListEl.textContent = 'No weak characters detected last session.';
+    selectWeakBtn.disabled = true;
+    return;
+  }
+
+  selectWeakBtn.disabled = false;
+
+  const lines = weak.slice(0, 12).map(w=>{
+    const pct = Math.round(w.missRate * 100);
+    return `${w.kana} (${w.primary}) — ${w.incorrect}/${w.attempts} wrong (${pct}%)`;
+  });
+
+  weakListEl.innerHTML =
+    `<div style="font-weight:700; margin-bottom:6px;">Weak characters</div>` +
+    `<div>${lines.map(x=>`• ${x}`).join('<br/>')}</div>` +
+    (weak.length > 12 ? `<div class="small" style="margin-top:6px;">(+${weak.length - 12} more)</div>` : '');
+}
+
+function addWeakToSelection(){
+  const ls = loadLastSession();
+  const weak = Array.isArray(ls?.weak) ? ls.weak : [];
+  if (weak.length === 0) return;
+
+  weak.forEach(w => selected.add(w.key));
+  saveSelection();
+  updateSelectionCounts();
+  renderChart();
+
+  selectMsgEl.textContent = `Added ${weak.length} weak character${weak.length === 1 ? '' : 's'} to your selection.`;
+  selectMsgEl.className = 'msg ok';
+}
+
+/** ----------------------------
+ *  Event listeners
+ * -----------------------------*/
+settingsLink.addEventListener('click', ()=>{
+  settingsPanel.classList.toggle('show');
+
+
+if (funModeToggle){
+  funModeToggle.addEventListener('change', ()=>{
+    applyFunMode(funModeToggle.checked);
+  });
+}
+});
+
+selectAllBtn.addEventListener('click', ()=>{
+  selected.clear();
+  chartRows.forEach((rowObj, rIdx)=>{
+    rowObj.cells.forEach((cell, cIdx)=>{
+      if (cell) selected.add(`${rIdx}-${cIdx}`);
+    });
+  });
+  saveSelection();
+  updateSelectionCounts();
+  renderChart();
+  selectMsgEl.textContent = '';
+  selectMsgEl.className = 'msg';
+});
+
+clearAllBtn.addEventListener('click', ()=>{
+  selected.clear();
+  saveSelection();
+  updateSelectionCounts();
+  renderChart();
+  selectMsgEl.textContent = '';
+  selectMsgEl.className = 'msg';
+});
+
+startBtn.addEventListener('click', startSession);
+
+shuffleBtn.addEventListener('click', ()=>{
+  shuffleInPlace(deck);
+  setStatus('Shuffled.', 'ok');
+  updateInDeck();
+  focusAnswer();
+});
+
+skipBtn.addEventListener('click', ()=>{
+  if (!current) return;
+  // Skip does not count toward stats. Reinsert a bit later and move on.
+  reinsertLater(current, 2);
+  drawNextCard();
+});
+
+endBtn.addEventListener('click', endSession);
+
+answerInput.addEventListener('keydown', (e)=>{
+  if (e.key === 'Enter'){
+    e.preventDefault();
+    submitAnswer();
+  }
+});
+
+selectWeakBtn.addEventListener('click', addWeakToSelection);
+
+/** ----------------------------
+ *  Init
+ * -----------------------------*/
+loadSelection();
+
+loadFunMode();
+lastSession = loadLastSession();
+updateSelectionCounts();
+renderChart();
+renderLastSessionPanel();
+showSelectionScreen();
+</script>
+</body>
+</html>

@@ -510,18 +510,47 @@ function loadLastSession(){
     if (!raw) return null;
     const obj = JSON.parse(raw);
     return obj && typeof obj === 'object' ? obj : null;
-  } 
-  catch { return null; }
+  } catch (e){
+    return null;
+  }
 }
 
 function safeGet(key){
-  try { return localStorage.getItem(key); }
-  catch { return null; }
+  try{
+    return localStorage.getItem(key);
+  } catch (e){
+    return null;
+  }
 }
 
 function safeSet(key, value){
-  try { localStorage.setItem(key, value); }
-  catch { /* ignore */ }
+  try{
+    localStorage.setItem(key, value);
+  } catch (e){
+    // ignore
+  }
+}
+
+function applyFunMode(on){
+  try{
+    if (on) selectionScreen.classList.add('fun-mode');
+    else selectionScreen.classList.remove('fun-mode');
+    safeSet(LS_FUNMODE, on ? '1' : '0');
+  } catch (e){
+    console.warn('applyFunMode failed', e);
+  }
+}
+
+function loadFunMode(){
+  try{
+    if (!funModeToggle) return;
+    const val = safeGet(LS_FUNMODE);
+    const isOn = val === '1';
+    funModeToggle.checked = isOn;
+    applyFunMode(isOn);
+  } catch (e){
+    console.warn('Fun mode load failed', e);
+  }
 }
 
 function applyFunMode(on){

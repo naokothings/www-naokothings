@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Clippy's BACK!</title>
-  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <title>Clippy's BACK! 📎</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📎</text></svg>">
+  
   <style>
     body {
       font-family: Verdana, Geneva, sans-serif;
@@ -13,7 +14,7 @@
       background-position: center;
       background-repeat: no-repeat;
       background-attachment: fixed;
-      color: #333; /* Dark text to contrast the light background */
+      color: #333;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -27,6 +28,35 @@
       text-shadow: 1px 1px 2px rgba(255,255,255,0.9);
     }
 
+    /* Settings in Top Right of Page */
+    .page-settings {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      text-align: right;
+    }
+    #settingsBtn {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid #ccc;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .settings-menu {
+      background: white;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-top: 10px;
+      min-width: 180px;
+      text-align: left;
+    }
+
     .container {
       display: flex;
       gap: 20px;
@@ -38,18 +68,24 @@
       border-radius: 12px;
       box-shadow: 0 8px 16px rgba(0,0,0,0.15);
     }
+
     .column.left,
     .column.right {
       flex: 1;
+      display: flex;
+      flex-direction: column;
     }
     .column.middle {
       flex: 1.5;
       padding: 0 20px;
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
     }
+
     textarea {
       width: 100%;
-      height: 400px;
+      height: 450px;
       padding: 10px;
       font-size: 14px;
       box-sizing: border-box;
@@ -58,60 +94,119 @@
       resize: vertical;
       font-family: monospace;
     }
+
+    .counter-label {
+      font-size: 12px;
+      color: #666;
+      font-style: italic;
+      margin-top: 5px;
+      text-align: right;
+    }
+
     select, input[type="text"], button {
-      width: 100%;
       padding: 8px;
-      margin-top: 10px;
       font-family: Verdana, Geneva, sans-serif;
       box-sizing: border-box;
       border-radius: 6px;
       border: 1px solid #aaa;
       font-size: 14px;
     }
-    button {
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #005500;
-      color: white;
-    }
+    button { cursor: pointer; transition: all 0.2s ease; }
+    
     .transform-pair {
-      margin-bottom: 15px;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 10px;
-    }
-    .inline {
+      margin-bottom: 12px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 12px;
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
     }
-    .btn-row {
+
+    .transform-pair select, .transform-pair input { flex: 1; min-width: 80px; }
+
+    .btn-step {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
       display: flex;
-      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      font-weight: bold;
+      border: 1px solid #999;
+      background: #eee;
     }
+    .btn-add { color: green; border-color: green; }
+    .btn-remove { color: #cc0000; border-color: #cc0000; }
+
     #goButton {
       margin-top: 20px;
       background-color: green;
       color: white;
       font-weight: bold;
       border: none;
+      width: 100%;
+      padding: 15px;
+      border-radius: 10px;
     }
-    .hidden {
-      display: none;
+    #goButton:hover { background-color: #005500; }
+
+    .reset-circle {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      font-weight: bold;
+      font-size: 11px;
+      margin: 20px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     }
+    .reset-circle:hover { background-color: #cc0000; transform: rotate(15deg); }
+
+    .copy-btn {
+      background-color: #eee;
+      color: #333;
+      font-weight: normal;
+      border: 1px solid #aaa;
+      width: 120px;
+      margin-left: auto;
+    }
+
+    .inline {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+      min-height: 40px;
+    }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
 
+  <div class="page-settings">
+    <button id="settingsBtn" onclick="toggleSettings()" title="Settings">⚙️</button>
+    <div id="settingsMenu" class="settings-menu hidden">
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+        <input type="checkbox" id="dedupeCheckbox" checked onchange="processText()"> 
+        Auto-remove duplicates
+      </label>
+    </div>
+  </div>
+
   <h1>Naoko Presents: CLIPPY!! 📎📎📎</h1>
 
   <div class="container">
-    <!-- Left Column -->
     <div class="column left">
       <div class="inline">
         <label for="inputDelimiter">Delimiter:</label>
-        <select id="inputDelimiter">
+        <select id="inputDelimiter" onchange="updateInputCount()">
           <option value="linebreak">Line break</option>
           <option value="comma">Comma ,</option>
           <option value="space">Space</option>
@@ -119,196 +214,178 @@
           <option value="semicolon">Semicolon ;</option>
           <option value="other">Other</option>
         </select>
-        <input type="text" id="customInputDelimiter" placeholder="Custom delimiter" class="hidden" style="width: 150px;" />
+        <input type="text" id="customInputDelimiter" placeholder="Custom..." class="hidden" style="width: 80px;" oninput="updateInputCount()" />
       </div>
-      <textarea id="inputBox" placeholder="Paste your text here..."></textarea>
+      <textarea id="inputBox" placeholder="Paste your text here..." oninput="updateInputCount()"></textarea>
+      <div id="inputCount" class="counter-label">Count: 0</div>
     </div>
 
-    <!-- Middle Column -->
     <div class="column middle" id="transformControls">
       <div id="transformList"></div>
-
-      <div class="btn-row">
-        <button onclick="removeTransform()">-</button>
-        <button onclick="addTransform()">+</button>
-      </div>
-
       <button id="goButton" onclick="processText()">GO CLIPPY!</button>
+      <button class="reset-circle" onclick="resetClippy()">RESET</button>
     </div>
 
-    <!-- Right Column -->
     <div class="column right">
+      <div class="inline">
+        <button class="copy-btn" id="copyButton" onclick="copyAll()">Copy all 📋</button>
+      </div>
       <textarea id="outputBox" placeholder="Output will appear here..."></textarea>
+      <div id="outputCount" class="counter-label">Count: 0</div>
     </div>
   </div>
 
 <script>
-  let transformCount = 0;
+  function toggleSettings() {
+    document.getElementById('settingsMenu').classList.toggle('hidden');
+  }
 
-  function addTransform() {
+  // Close settings if clicking outside
+  window.onclick = function(event) {
+    if (!event.target.matches('#settingsBtn') && !event.target.closest('#settingsMenu')) {
+      document.getElementById('settingsMenu').classList.add('hidden');
+    }
+  }
+
+  function addTransform(afterElement = null) {
     const container = document.createElement('div');
     container.className = 'transform-pair';
-    container.dataset.index = transformCount;
 
-    // Action dropdown
     const actionSelect = document.createElement('select');
-    actionSelect.innerHTML = `
-      <option value="add">Add</option>
-      <option value="remove">Remove</option>
-      <option value="separate">Separate</option>
-    `;
     actionSelect.className = 'action';
+    actionSelect.innerHTML = `<option value="add">Add</option><option value="remove">Remove</option><option value="separate">Separate</option>`;
 
-    // Delimiter dropdown
     const delimiterSelect = document.createElement('select');
-    delimiterSelect.innerHTML = `
-      <option value="quotes">Quotes ""</option>
-      <option value="comma">Comma ,</option>
-      <option value="semicolon">Semicolon ;</option>
-      <option value="colon">Colon :</option>
-      <option value="separate line">Line Break (\\n)</option>
-      <option value="space">Space ( )</option>
-      <option value="other">Other</option>
-    `;
     delimiterSelect.className = 'delimiter';
+    delimiterSelect.innerHTML = `<option value="quotes">Quotes ""</option><option value="comma">Comma ,</option><option value="semicolon">Semicolon ;</option><option value="colon">Colon :</option><option value="separate line">Line Break (\\n)</option><option value="space">Space ( )</option><option value="other">Other</option>`;
 
-    // Custom delimiter input
     const customInput = document.createElement('input');
     customInput.type = 'text';
-    customInput.placeholder = 'Custom delimiter';
+    customInput.placeholder = 'Custom...';
     customInput.className = 'custom-delim hidden';
 
-    // Logic for showing/hiding fields
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'btn-step btn-remove';
+    removeBtn.innerText = '−';
+    removeBtn.onclick = () => {
+      if (document.querySelectorAll('.transform-pair').length > 1) container.remove();
+    };
+
+    const addBtn = document.createElement('button');
+    addBtn.className = 'btn-step btn-add';
+    addBtn.innerText = '+';
+    addBtn.onclick = () => addTransform(container);
+
     actionSelect.addEventListener('change', () => {
-      if (actionSelect.value === 'separate') {
-        delimiterSelect.classList.add('hidden');
-        customInput.classList.add('hidden');
-      } else {
-        delimiterSelect.classList.remove('hidden');
-        if (delimiterSelect.value === 'other') {
-          customInput.classList.remove('hidden');
-        }
-      }
+      const isSeparate = actionSelect.value === 'separate';
+      delimiterSelect.classList.toggle('hidden', isSeparate);
+      customInput.classList.toggle('hidden', isSeparate || delimiterSelect.value !== 'other');
     });
 
     delimiterSelect.addEventListener('change', () => {
-      if (delimiterSelect.value === 'other') {
-        customInput.classList.remove('hidden');
-      } else {
-        customInput.classList.add('hidden');
-      }
+      customInput.classList.toggle('hidden', delimiterSelect.value !== 'other');
     });
 
-    container.appendChild(actionSelect);
-    container.appendChild(delimiterSelect);
-    container.appendChild(customInput);
-
-    document.getElementById('transformList').appendChild(container);
-    transformCount++;
+    container.append(actionSelect, delimiterSelect, customInput, removeBtn, addBtn);
+    if (afterElement) afterElement.after(container);
+    else document.getElementById('transformList').appendChild(container);
   }
 
-  function removeTransform() {
-    const list = document.getElementById('transformList');
-    if (list.children.length > 1) {
-      list.removeChild(list.lastChild);
-      transformCount--;
-    }
+  function resetClippy() {
+    document.getElementById('inputBox').value = '';
+    document.getElementById('outputBox').value = '';
+    document.getElementById('inputDelimiter').value = 'linebreak';
+    document.getElementById('customInputDelimiter').classList.add('hidden');
+    document.getElementById('transformList').innerHTML = '';
+    document.getElementById('inputCount').innerText = 'Count: 0';
+    document.getElementById('outputCount').innerText = 'Count: 0';
+    addTransform();
   }
 
-  // Initial transform pair
-  addTransform();
-
-  // Show/hide custom input delimiter in left column
-  document.getElementById('inputDelimiter').addEventListener('change', function () {
-    const customBox = document.getElementById('customInputDelimiter');
-    customBox.classList.toggle('hidden', this.value !== 'other');
-  });
+  function copyAll() {
+    const output = document.getElementById('outputBox');
+    const btn = document.getElementById('copyButton');
+    output.select();
+    document.execCommand('copy');
+    const originalText = btn.innerText;
+    btn.innerText = 'Copied! ✅';
+    btn.style.backgroundColor = '#28a745';
+    btn.style.color = 'white';
+    setTimeout(() => {
+      btn.innerText = originalText;
+      btn.style.backgroundColor = '';
+      btn.style.color = '';
+    }, 1500);
+  }
 
   function getInputValues() {
-    const text = document.getElementById('inputBox').value;
+    const text = document.getElementById('inputBox').value.trim();
+    if (!text) return [];
     const delimType = document.getElementById('inputDelimiter').value;
     let delimiter;
 
-    switch (delimType) {
-      case 'space': delimiter = /\s+/; break;
-      case 'linebreak': delimiter = /\n+/; break;
-      case 'comma': delimiter = /,+/; break;
-      case 'colon': delimiter = /:+/; break;
-      case 'semicolon': delimiter = /;+/; break;
-      case 'other':
-        delimiter = document.getElementById('customInputDelimiter').value;
-        delimiter = new RegExp(delimiter, 'g');
-        break;
+    if (delimType === 'other') {
+      let custom = document.getElementById('customInputDelimiter').value || ' ';
+      delimiter = new RegExp(custom.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&'), 'g');
+    } else {
+      switch (delimType) {
+        case 'space': delimiter = /\s+/; break;
+        case 'linebreak': delimiter = /\n+/; break;
+        case 'comma': delimiter = /,+/; break;
+        case 'colon': delimiter = /:+/; break;
+        case 'semicolon': delimiter = /;+/; break;
+      }
     }
-
-    let rawSplit = text.split(delimiter).filter(item => item.trim() !== '');
-    if (delimType !== 'linebreak' && delimType !== 'space') {
-      rawSplit = rawSplit.map((val, i, arr) => {
-        if (i < arr.length - 1) return val + getDelimiterString(delimType);
-        return val;
-      });
-    }
-    return rawSplit;
+    return text.split(delimiter).filter(item => item.trim() !== '');
   }
 
-  function getDelimiterString(type) {
-    switch (type) {
-      case 'comma': return ',';
-      case 'colon': return ':';
-      case 'semicolon': return ';';
-      case 'other': return document.getElementById('customInputDelimiter').value;
-      default: return ' ';
-    }
+  function updateInputCount() {
+    const values = getInputValues();
+    document.getElementById('inputCount').innerText = `Count: ${values.length}`;
+    const customBox = document.getElementById('customInputDelimiter');
+    customBox.classList.toggle('hidden', document.getElementById('inputDelimiter').value !== 'other');
   }
 
   function processText() {
     let values = getInputValues();
     const steps = document.querySelectorAll('.transform-pair');
     let finalAction = '';
-    let joinDelimiter = ''; // Default: no spaces between joined items
 
     steps.forEach(step => {
       const action = step.querySelector('.action').value;
-      const delimiterSelect = step.querySelector('.delimiter');
-      const customInput = step.querySelector('.custom-delim');
-      let delimiter = '';
+      const delimType = step.querySelector('.delimiter').value;
+      const customVal = step.querySelector('.custom-delim').value;
+      let char = '';
 
-      if (action === 'separate') {
-        finalAction = 'separate'; // we'll handle this at the end
-        return;
-      }
+      if (action === 'separate') { finalAction = 'separate'; return; }
 
-      if (delimiterSelect) {
-        const type = delimiterSelect.value;
-        switch (type) {
-          case 'quotes': delimiter = '"'; break;
-          case 'comma': delimiter = ','; break;
-          case 'semicolon': delimiter = ';'; break;
-          case 'colon': delimiter = ':'; break;
-          case 'other': delimiter = customInput.value; break;
-          case 'space': delimiter = ' '; break;
-          case 'separate line': delimiter = '\n'; break;
-        }
+      switch (delimType) {
+        case 'quotes': char = '"'; break;
+        case 'comma': char = ','; break;
+        case 'semicolon': char = ';'; break;
+        case 'colon': char = ':'; break;
+        case 'space': char = ' '; break;
+        case 'separate line': char = '\n'; break;
+        case 'other': char = customVal; break;
       }
 
       if (action === 'add') {
-        values = values.map(val => {
-          if (delimiterSelect.value === 'quotes') {
-            return `"${val}"`;
-          } else {
-            return val + delimiter;
-          }
-        });
+        values = values.map(val => (delimType === 'quotes') ? `"${val}"` : val + char);
       } else if (action === 'remove') {
-        const escaped = delimiter.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
-        const regex = new RegExp(escaped, 'g');
+        const regex = new RegExp(char.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&'), 'g');
         values = values.map(val => val.replace(regex, ''));
       }
     });
 
-    const output = (finalAction === 'separate') ? values.join('\n') : values.join(joinDelimiter);
-    document.getElementById('outputBox').value = output;
+    if (document.getElementById('dedupeCheckbox').checked) {
+      values = [...new Set(values)];
+    }
+
+    document.getElementById('outputBox').value = (finalAction === 'separate') ? values.join('\n') : values.join('');
+    document.getElementById('outputCount').innerText = `Count: ${values.length}`;
   }
+
+  addTransform();
 </script>
 
 </body>

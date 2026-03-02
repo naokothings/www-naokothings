@@ -90,7 +90,8 @@
       align-items:stretch;
       user-select:none;
     }
-    .hdr, .rowhdr{
+
+    .hdr, .rowhdr {
       font-weight:700;
       text-align:center;
       padding:10px 0;
@@ -98,6 +99,8 @@
       border:1px solid #eee;
       background:#a6a6a6;
       cursor:pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     .hdr:hover, .rowhdr:hover{ background:#f0f0f0; }
     .hdr.active, .rowhdr.active{
@@ -201,7 +204,7 @@
       padding:9px 12px;
       border:1px solid #ddd;
       border-radius:12px;
-      font-size:15px;
+      font-size:16px;
       text-align:center;
     }
 
@@ -277,7 +280,7 @@
 
 /* 0: N* - New #991567 */
 #selectionScreen.fun-mode .hdr[data-col="0"] { background:#991567; color:#fff; }
-#selectionScreen.fun-mode .cell.selected[data-col="0"] { background:#f9edf5; border-color:#991567; color:#111
+#selectionScreen.fun-mode .cell.selected[data-col="0"] { background:#f9edf5; border-color:#991567; color:#111; }
   </style>
 </head>
 
@@ -635,15 +638,17 @@ const display = (lbl === 'N*') ? 'ン' : (lbl === '' ? '∅' : lbl);
     if (isAllSelected(colKeys)) h.classList.add('active');
     if (hoverCol === uiColIdx) h.classList.add('hover');
 
-    h.addEventListener('mouseenter', ()=>{
-      hoverCol = uiColIdx;
-      hoverRow = null;
-      renderChart();
-    });
-    h.addEventListener('mouseleave', ()=>{
-      hoverCol = null;
-      renderChart();
-    });
+    if (window.matchMedia("(pointer: fine)").matches) {
+      h.addEventListener('mouseenter', ()=>{
+        hoverCol = uiColIdx;
+        hoverRow = null;
+        renderChart();
+      });
+      h.addEventListener('mouseleave', ()=>{
+        hoverCol = null;
+        renderChart();
+      });
+    }
 
     h.addEventListener('click', ()=>{
       const all = isAllSelected(colKeys);
@@ -717,15 +722,17 @@ if (selected.has(key)) d.classList.add('selected');
     if (isAllSelected(rowKeys)) rh.classList.add('active');
     if (hoverRow === uiRowIdx) rh.classList.add('hover');
 
-    rh.addEventListener('mouseenter', ()=>{
-      hoverRow = uiRowIdx;
-      hoverCol = null;
-      renderChart();
-    });
-    rh.addEventListener('mouseleave', ()=>{
-      hoverRow = null;
-      renderChart();
-    });
+    if (window.matchMedia("(pointer: fine)").matches) {
+      rh.addEventListener('mouseenter', ()=>{
+        hoverRow = uiRowIdx;
+        hoverCol = null;
+        renderChart();
+      });
+      rh.addEventListener('mouseleave', ()=>{
+        hoverRow = null;
+        renderChart();
+      });
+    }
 
     rh.addEventListener('click', ()=>{
       const all = isAllSelected(rowKeys);
@@ -823,7 +830,7 @@ function drawNextCard(){
   current = deck.shift();
   bigKanaEl.textContent = current.kana;
   updateInDeck();
-  focusAnswer();
+  setTimeout(() => focusAnswer(), 50);
 }
 
 function reinsertLater(card, offset){

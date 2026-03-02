@@ -231,6 +231,53 @@
     }
     .settings.show{ display:block; }
     label{ display:inline-flex; gap:8px; align-items:center; cursor:pointer; }
+  
+/* ============================
+   FUN MODE (Crayola Theme)
+   ============================ */
+/* 10: Vowels - Keep */
+#selectionScreen.fun-mode .hdr[data-col="10"] { background:#ff000d; color:#fff; }
+#selectionScreen.fun-mode .cell.selected[data-col="10"] { background:#ffe5e6; border-color:#ff000d; color:#111; }
+
+/* 9: K-Group - Keep */
+#selectionScreen.fun-mode .hdr[data-col="9"] { background:#ff5e00; color:#fff; }
+#selectionScreen.fun-mode .cell.selected[data-col="9"] { background:#fff3eb; border-color:#ff5e00; color:#111; }
+
+/* 8: S-Group - Keep */
+#selectionScreen.fun-mode .hdr[data-col="8"] { background:#ff9d00; color:#fff; }
+#selectionScreen.fun-mode .cell.selected[data-col="8"] { background:#fff8eb; border-color:#ff9d00; color:#111; }
+
+/* 7: T-Group - New #ffd000 */
+#selectionScreen.fun-mode .hdr[data-col="7"] { background:#ffd000; color:#111; }
+#selectionScreen.fun-mode .cell.selected[data-col="7"] { background:#fffaf5; border-color:#ffd000; color:#111; }
+
+/* 6: N-Group - New #00ff33 */
+#selectionScreen.fun-mode .hdr[data-col="6"] { background:#a6ff00; color:#111; }
+#selectionScreen.fun-mode .cell.selected[data-col="6"] { background:#f1ffcc; border-color:a6ff00; color:#111; }
+
+/* 5: H-Group - New #1e8733 */
+#selectionScreen.fun-mode .hdr[data-col="5"] { background:#00ff33; color:#111; }
+#selectionScreen.fun-mode .cell.selected[data-col="5"] { background:#cafcd4; border-color:#00ff33; color:#111; }
+
+/* 4: M-Group - New #16c4bc */
+#selectionScreen.fun-mode .hdr[data-col="4"] { background:#00fff2; color:#111; }
+#selectionScreen.fun-mode .cell.selected[data-col="4"] { background:#c4fffc; border-color:#00fff2; color:#111; }
+
+/* 3: Y-Group - New #0288f5 */
+#selectionScreen.fun-mode .hdr[data-col="3"] { background:#2bc7ff; color:#111; }
+#selectionScreen.fun-mode .cell.selected[data-col="3"] { background:#eaf6ff; border-color:#0288f5; color:#111; }
+
+/* 2: R-Group - New #1d0fdb */
+#selectionScreen.fun-mode .hdr[data-col="2"] { background:#1d0fdb; color:#fff; }
+#selectionScreen.fun-mode .cell.selected[data-col="2"] { background:#e8e7fc; border-color:#1d0fdb; color:#111; }
+
+/* 1: W-Group - Keep */
+#selectionScreen.fun-mode .hdr[data-col="1"] { background:#8000ff; color:#fff; }
+#selectionScreen.fun-mode .cell.selected[data-col="1"] { background:#f2e5ff; border-color:#8000ff; color:#111; }
+
+/* 0: N* - New #991567 */
+#selectionScreen.fun-mode .hdr[data-col="0"] { background:#991567; color:#fff; }
+#selectionScreen.fun-mode .cell.selected[data-col="0"] { background:#f9edf5; border-color:#991567; color:#111
   </style>
 </head>
 
@@ -247,7 +294,7 @@
         </div>
 
         <div class="row" style="gap:8px;">
-          <button class="btn btn-link" id="settingsLink" type="button">Settings</button>
+          <button class="btn btn-link" id="settingsLink" type="button">⚙️Settings️</button>
           <button class="btn btn-green" id="startBtn" type="button">START</button>
         </div>
       </div>
@@ -257,6 +304,9 @@
         <label class="small">
           <input type="checkbox" id="strictMode" checked />
           Strict Hepburn only (recommended)
+        </label>
+        <label class="small" style="margin-top:10px;">
+         <input type="checkbox" id="funModeToggle" checked /> Fun Mode 🌈
         </label>
         <div class="small" style="margin-top:8px;">
           In non-strict mode, the app accepts common alternate spellings (e.g., si for shi) but still shows Hepburn as the “answer.”
@@ -392,6 +442,10 @@ const shuffleBtn = document.getElementById('shuffleBtn');
 const skipBtn = document.getElementById('skipBtn');
 const endBtn = document.getElementById('endBtn');
 
+
+
+const funModeToggle = document.getElementById('funModeToggle');
+const LS_FUNMODE = 'katakana_fun_mode_v1';
 // State
 const selected = new Set(); // keys: "rIdx-cIdx"
 let hoverRow = null; // UI row index 0..4
@@ -465,7 +519,46 @@ function loadLastSession(){
     if (!raw) return null;
     const obj = JSON.parse(raw);
     return obj && typeof obj === 'object' ? obj : null;
-  } catch { return null; }
+  } catch (e){
+    return null;
+  }
+}
+
+function safeGet(key){
+  try{
+    return localStorage.getItem(key);
+  } catch (e){
+    return null;
+  }
+}
+
+function safeSet(key, value){
+  try{
+    localStorage.setItem(key, value);
+  } catch (e){
+    // ignore
+  }
+}
+
+function applyFunMode(on){
+  try{
+    if (on) selectionScreen.classList.add('fun-mode');
+    else selectionScreen.classList.remove('fun-mode');
+    safeSet(LS_FUNMODE, on ? '1' : '0');
+  } catch (e){
+    console.warn('applyFunMode failed', e);
+  }
+}
+
+function loadFunMode() {
+  if (!funModeToggle) return;
+  const val = safeGet(LS_FUNMODE);
+  
+  // Logic: If there is no saved setting (val is null), default to true (isOn = true)
+  const isOn = (val === null) ? true : (val === '1');
+  
+  funModeToggle.checked = isOn;
+  applyFunMode(isOn);
 }
 
 function shuffleInPlace(arr){
@@ -532,7 +625,10 @@ function renderChart(){
     const h = document.createElement('div');
     h.className = 'hdr';
 
-    const display = (lbl === 'N*') ? 'ン' : (lbl === '' ? '∅' : lbl);
+    
+
+    h.dataset.col = uiColIdx;
+const display = (lbl === 'N*') ? 'ン' : (lbl === '' ? '∅' : lbl);
     h.textContent = display;
 
     const colKeys = getKeysForUiColumn(uiColIdx);
@@ -587,7 +683,9 @@ function renderChart(){
       const cell = rowObj.cells[uiRowIdx];
 
       d.className = 'cell';
-      if (selected.has(key)) d.classList.add('selected');
+      
+      d.dataset.col = uiColIdx;
+if (selected.has(key)) d.classList.add('selected');
       if (hoverRow === uiRowIdx || hoverCol === uiColIdx) d.classList.add('hl');
 
       d.innerHTML = `
@@ -872,6 +970,9 @@ function endSession(){
   answerInput.disabled = false;
   setStatus('', '');
   showSelectionScreen();
+
+// Load theme LAST so it can't prevent rendering if it errors
+try { loadFunMode(); } catch (e) { console.warn('Fun mode load failed', e); }
 }
 
 function renderLastSessionPanel(){
@@ -932,6 +1033,13 @@ function addWeakToSelection(){
  * -----------------------------*/
 settingsLink.addEventListener('click', ()=>{
   settingsPanel.classList.toggle('show');
+
+
+if (funModeToggle){
+  funModeToggle.addEventListener('change', ()=>{
+    applyFunMode(funModeToggle.checked);
+  });
+}
 });
 
 selectAllBtn.addEventListener('click', ()=>{
@@ -988,6 +1096,8 @@ selectWeakBtn.addEventListener('click', addWeakToSelection);
  *  Init
  * -----------------------------*/
 loadSelection();
+
+loadFunMode();
 lastSession = loadLastSession();
 updateSelectionCounts();
 renderChart();

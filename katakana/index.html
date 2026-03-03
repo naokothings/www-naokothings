@@ -8,7 +8,8 @@
   <style>
     :root{
       --bg:#fafafa; --panel:#fff; --border:#e6e6e6; --text:#111;
-      --muted:#555; --pill:#f3f3f3; --green:#1f8a4c;
+      --muted:#555; --pill:#f3f3f3; --green:#1f8a4c; --hover-green:#2ecc71;
+      --error-red: #fff1f1; --error-border: #ffb3b3;
     }
     *{ box-sizing:border-box; }
     body{
@@ -17,22 +18,14 @@
       background:var(--bg); color:var(--text);
     }
 
-    /* Seamless Top Bar */
     .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 20px 0 20px; /* Added spacing from the very top */
-      background: transparent; 
-      border: none;
-      position: relative;
-      z-index: 1000;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 20px 0 20px; background: transparent; position: relative; z-index: 1000;
     }
 
     .content-area { padding: 0 20px 20px 20px; max-width: 1200px; margin: 0 auto; }
     h1 { margin: 10px 0 25px; font-size: 26px; text-align: center; }
 
-    /* Settings Dropdown */
     .settings-dropdown {
       position: absolute; top: 65px; right: 20px;
       width: 250px; padding: 15px; background: #fff;
@@ -51,13 +44,16 @@
     .btn{
       border: 1px solid #ddd; background:#fff;
       border-radius:10px; padding:8px 12px; cursor:pointer; font-weight: 500;
-      transition: background 0.2s;
+      text-decoration: none; color: inherit; display: inline-flex; align-items: center; justify-content: center;
     }
-    .btn:hover{ background:#f6f6f6; }
+    .btn:hover, .hdr:hover, .rowhdr:hover, .cell:not(.empty):hover { 
+      background: var(--hover-green) !important; 
+      color: #fff !important;
+      border-color: var(--hover-green) !important;
+    }
     
     .btn-circle {
       border-radius: 50%; width: 44px; height: 44px; 
-      display: flex; align-items: center; justify-content: center;
       font-size: 20px; padding: 0;
     }
 
@@ -84,20 +80,23 @@
     .hdr, .rowhdr{
       font-weight:700; text-align:center; padding:10px 0;
       border-radius:10px; border:1px solid #eee; background:#e0e0e0;
-      cursor:pointer;
+      cursor:pointer; transition: all 0.2s;
     }
     
     .cell{
       min-height:60px; border:1px solid #eee; border-radius:12px;
       background:#fff; display:grid; place-items:center; cursor:pointer;
-      padding:6px 4px;
+      padding:6px 4px; transition: all 0.2s;
     }
     .cell.selected{ background:#111; color:#fff; border-color:#111; }
+    .cell.missed { background: var(--error-red); border-color: var(--error-border); }
+    .cell.selected.missed { border-color: #ff0000; border-width: 2px; }
+
     .kana{ font-size:22px; }
     .romaji{ font-size:11px; opacity:.7; }
     .hidden{ display:none !important; }
 
-    /* Fun Mode Colors */
+    /* Fun Mode colors omitted for brevity but preserved in full code */
     .fun-mode .hdr[data-col="10"] { background:#ff000d !important; color:#fff; }
     .fun-mode .cell.selected[data-col="10"] { background:#ffe5e6 !important; border-color:#ff000d !important; color:#111; }
     .fun-mode .hdr[data-col="9"] { background:#ff5e00 !important; color:#fff; }
@@ -125,14 +124,7 @@
 
 <body>
   <div class="top-bar">
-    <button class="btn btn-circle" {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1; /* Prevents text-alignment shifts */
-  padding: 0;    /* Ensures the circle stays a perfect circle */
-} onclick="window.location.href='https://www.justnaokothings.com'">🏠</button>
-
+    <a href="https://www.justnaokothings.com" class="btn btn-circle" id="homeLink">🏠</a>
     <button class="btn btn-circle" id="gearBtn">⚙️</button>
   </div>
 
@@ -157,8 +149,10 @@
           <div id="chart"></div>
         </div>
         <div class="panel">
-          <div class="pill">Selected: <b id="selectedCount">0</b></div>
-          <div id="summary" style="margin-top:20px; font-size:13px; color:#666;">Choose characters to practice.</div>
+          <div class="pill" style="width:100%; justify-content:center; margin-bottom:15px;">Selected: <b id="selectedCount">0</b></div>
+          <div style="font-weight:bold; font-size:14px; border-bottom:1px solid #eee; padding-bottom:5px; margin-bottom:10px;">Last Session Summary</div>
+          <div id="summaryStats" style="font-size:13px; color:#444; line-height:1.6; margin-bottom: 15px;">No data yet.</div>
+          <button class="btn hidden" id="selectWeakBtn" style="width:100%; border-color: #ffb3b3; color: #d63031;">🎯 Select Weakest</button>
         </div>
       </div>
     </div>
@@ -193,8 +187,9 @@ const chartRows = [
 ];
 
 const uiColumnOrder = ['N*','W','R','Y','M','H','N','T','S','K',''];
-const selected = new Set();
-let deck = [], current = null, statCorrect = 0, statIncorrect = 0;
+let selected = new Set();
+let missedChars = new Set(); 
+let fullSet = [], deck = [], current = null, statCorrect = 0, statIncorrect = 0;
 
 function updateFunMode() {
   const isFun = document.getElementById('funModeToggle').checked;
@@ -209,8 +204,7 @@ function renderChart() {
 
   uiColumnOrder.forEach((lbl, uiColIdx) => {
     const h = document.createElement('div');
-    h.className = 'hdr';
-    h.dataset.col = uiColIdx;
+    h.className = 'hdr'; h.dataset.col = uiColIdx;
     h.textContent = (lbl === 'N*') ? 'ン' : (lbl === '' ? '∅' : lbl);
     h.onclick = () => {
       const rowObj = chartRows.find(r => r.rowLabel === lbl);
@@ -224,9 +218,7 @@ function renderChart() {
   });
 
   const corner = document.createElement('div');
-  corner.className = 'rowhdr';
-  corner.style.background = 'transparent';
-  corner.style.border = 'none';
+  corner.className = 'rowhdr'; corner.style.background = 'transparent'; corner.style.border = 'none';
   grid.appendChild(corner);
 
   ['A','I','U','E','O'].forEach((vowel, vIdx) => {
@@ -239,10 +231,17 @@ function renderChart() {
       } else {
         const rIdx = chartRows.indexOf(rowObj);
         const key = `${rIdx}-${vIdx}`;
-        d.className = 'cell' + (selected.has(key) ? ' selected' : '');
+        let classes = ['cell'];
+        if(selected.has(key)) classes.push('selected');
+        if(missedChars.has(key)) classes.push('missed');
+        d.className = classes.join(' ');
         d.dataset.col = uiColIdx;
         d.innerHTML = `<div class="kana">${cell.k}</div><div class="romaji">${cell.a[0]}</div>`;
-        d.onclick = () => { selected.has(key) ? selected.delete(key) : selected.add(key); updateCounts(); renderChart(); };
+        d.onclick = () => { 
+            selected.has(key) ? selected.delete(key) : selected.add(key); 
+            missedChars.delete(key); 
+            updateCounts(); renderChart(); 
+        };
       }
       grid.appendChild(d);
     });
@@ -261,22 +260,27 @@ document.getElementById('selectAll').onclick = () => {
 };
 
 document.getElementById('clearAll').onclick = () => {
-    selected.clear(); updateCounts(); renderChart();
+    selected.clear(); missedChars.clear(); updateCounts(); renderChart();
 };
 
 document.getElementById('startBtn').onclick = () => {
   if (selected.size === 0) return;
-  deck = Array.from(selected).map(k => {
+  statCorrect = 0; statIncorrect = 0;
+  document.getElementById('statCorrect').textContent = '0';
+  document.getElementById('statIncorrect').textContent = '0';
+  
+  fullSet = Array.from(selected).map(k => {
     const [r,c] = k.split('-').map(Number);
-    return { kana: chartRows[r].cells[c].k, answers: chartRows[r].cells[c].a };
+    return { kana: chartRows[r].cells[c].k, answers: chartRows[r].cells[c].a, key: k };
   });
+  deck = [...fullSet].sort(() => Math.random() - 0.5);
   document.getElementById('selectionScreen').classList.add('hidden');
   document.getElementById('flashScreen').classList.remove('hidden');
   drawNextCard();
 };
 
 function drawNextCard() {
-  if (deck.length === 0) { location.reload(); return; }
+  if (deck.length === 0) { deck = [...fullSet].sort(() => Math.random() - 0.5); }
   current = deck.shift();
   document.getElementById('bigKana').textContent = current.kana;
   document.getElementById('answerInput').value = '';
@@ -289,24 +293,51 @@ document.getElementById('answerInput').onkeydown = (e) => {
     const val = e.target.value.toLowerCase().trim();
     if(current.answers.includes(val)) {
       statCorrect++;
+      missedChars.delete(current.key);
       document.getElementById('status').textContent = '✅ Correct!';
       document.getElementById('status').style.color = 'green';
       setTimeout(drawNextCard, 500);
     } else {
       statIncorrect++;
+      missedChars.add(current.key);
       document.getElementById('status').textContent = `❌ It's ${current.answers[0]}`;
       document.getElementById('status').style.color = 'red';
+      const insertAt = Math.min(deck.length, 3);
+      deck.splice(insertAt, 0, current);
     }
     document.getElementById('statCorrect').textContent = statCorrect;
     document.getElementById('statIncorrect').textContent = statIncorrect;
   }
 };
 
+function finishSession() {
+  const total = statCorrect + statIncorrect;
+  if (total > 0) {
+    const acc = Math.round((statCorrect / total) * 100);
+    document.getElementById('summaryStats').innerHTML = `
+      <b>Accuracy:</b> ${acc}%<br>
+      <b>Incorrect:</b> ${statIncorrect} items<br>
+      <b>Total Tries:</b> ${total}
+    `;
+    if (missedChars.size > 0) document.getElementById('selectWeakBtn').classList.remove('hidden');
+  } else {
+    document.getElementById('selectWeakBtn').classList.add('hidden');
+  }
+  document.getElementById('flashScreen').classList.add('hidden');
+  document.getElementById('selectionScreen').classList.remove('hidden');
+  renderChart(); 
+}
+
+document.getElementById('selectWeakBtn').onclick = () => {
+    selected = new Set(missedChars);
+    updateCounts();
+    renderChart();
+};
+
+document.getElementById('endBtn').onclick = finishSession;
 document.getElementById('gearBtn').onclick = () => document.getElementById('settingsPanel').classList.toggle('show');
 document.getElementById('funModeToggle').onchange = updateFunMode;
-document.getElementById('endBtn').onclick = () => location.reload();
 
-// Initialize
 renderChart();
 updateFunMode();
 </script>

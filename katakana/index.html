@@ -90,13 +90,12 @@
     }
     .cell.selected{ background:#111; color:#fff; border-color:#111; }
     .cell.missed { background: var(--error-red); border-color: var(--error-border); }
-    .cell.selected.missed { border-color: #ff0000; border-width: 2px; }
 
     .kana{ font-size:22px; }
     .romaji{ font-size:11px; opacity:.7; }
     .hidden{ display:none !important; }
 
-    /* Fun Mode colors omitted for brevity but preserved in full code */
+    /* Fun Mode colors */
     .fun-mode .hdr[data-col="10"] { background:#ff000d !important; color:#fff; }
     .fun-mode .cell.selected[data-col="10"] { background:#ffe5e6 !important; border-color:#ff000d !important; color:#111; }
     .fun-mode .hdr[data-col="9"] { background:#ff5e00 !important; color:#fff; }
@@ -124,7 +123,7 @@
 
 <body>
   <div class="top-bar">
-    <a href="https://www.justnaokothings.com" class="btn btn-circle" id="homeLink">🏠</a>
+    <a href="https://www.justnaokothings.com" class="btn btn-circle">🏠</a>
     <button class="btn btn-circle" id="gearBtn">⚙️</button>
   </div>
 
@@ -150,9 +149,9 @@
         </div>
         <div class="panel">
           <div class="pill" style="width:100%; justify-content:center; margin-bottom:15px;">Selected: <b id="selectedCount">0</b></div>
-          <div style="font-weight:bold; font-size:14px; border-bottom:1px solid #eee; padding-bottom:5px; margin-bottom:10px;">Last Session Summary</div>
-          <div id="summaryStats" style="font-size:13px; color:#444; line-height:1.6; margin-bottom: 15px;">No data yet.</div>
-          <button class="btn hidden" id="selectWeakBtn" style="width:100%; border-color: #ffb3b3; color: #d63031;">🎯 Select Weakest</button>
+          <div style="font-weight:bold; font-size:14px; border-bottom:1px solid #eee; padding-bottom:5px; margin-bottom:10px;">Session Summary</div>
+          <div id="summaryStats" style="font-size:13px; color:#444; line-height:1.8; margin-bottom: 15px;">No data yet. Start a session to see stats!</div>
+          <button class="btn hidden" id="selectWeakBtn" style="width:100%; border: 2px solid #ffb3b3; color: #d63031; margin-top: 10px;">🎯 Select Weakest</button>
         </div>
       </div>
     </div>
@@ -162,10 +161,12 @@
         <div class="row" style="justify-content:center; margin-bottom:20px;">
           <div class="pill">Correct: <b id="statCorrect">0</b></div>
           <div class="pill">Incorrect: <b id="statIncorrect">0</b></div>
+          <div class="pill">Time: <b id="statTimer">0:00</b></div>
         </div>
         <div id="bigKana" style="font-size:120px; margin: 20px 0;">—</div>
         <input id="answerInput" type="text" placeholder="Type romaji..." style="width:80%; padding:15px; border-radius:12px; border:1px solid #ddd; font-size:20px; text-align:center;" autocomplete="off" />
         <div id="status" style="margin-top:20px; height:24px; font-weight:bold;"></div>
+        <div style="margin-top:10px; font-size:12px; color:#888;">Press <b>Space</b> to reveal answer</div>
         <button class="btn" id="endBtn" style="margin-top:30px; width:100%; padding: 12px;">END SESSION</button>
       </div>
     </div>
@@ -189,11 +190,31 @@ const chartRows = [
 const uiColumnOrder = ['N*','W','R','Y','M','H','N','T','S','K',''];
 let selected = new Set();
 let missedChars = new Set(); 
+
 let fullSet = [], deck = [], current = null, statCorrect = 0, statIncorrect = 0;
+let startTime, timerInterval;
 
 function updateFunMode() {
   const isFun = document.getElementById('funModeToggle').checked;
   document.body.classList.toggle('fun-mode', isFun);
+}
+
+function startTimer() {
+    startTime = Date.now();
+    timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const m = Math.floor(elapsed / 60);
+        const s = elapsed % 60;
+        document.getElementById('statTimer').textContent = `${m}:${s.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const m = Math.floor(elapsed / 60);
+    const s = elapsed % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
 function renderChart() {
@@ -239,7 +260,6 @@ function renderChart() {
         d.innerHTML = `<div class="kana">${cell.k}</div><div class="romaji">${cell.a[0]}</div>`;
         d.onclick = () => { 
             selected.has(key) ? selected.delete(key) : selected.add(key); 
-            missedChars.delete(key); 
             updateCounts(); renderChart(); 
         };
       }
@@ -252,7 +272,15 @@ function renderChart() {
   chartEl.appendChild(grid);
 }
 
-function updateCounts() { document.getElementById('selectedCount').textContent = selected.size; }
+function updateCounts() { 
+    document.getElementById('selectedCount').textContent = selected.size; 
+    const weakBtn = document.getElementById('selectWeakBtn');
+    if (missedChars.size > 0 && document.getElementById('flashScreen').classList.contains('hidden')) {
+        weakBtn.classList.remove('hidden');
+    } else {
+        weakBtn.classList.add('hidden');
+    }
+}
 
 document.getElementById('selectAll').onclick = () => {
     chartRows.forEach((r, rIdx) => r.cells.forEach((c, cIdx) => { if(c) selected.add(`${rIdx}-${cIdx}`); }));
@@ -265,9 +293,11 @@ document.getElementById('clearAll').onclick = () => {
 
 document.getElementById('startBtn').onclick = () => {
   if (selected.size === 0) return;
+  missedChars.clear(); 
   statCorrect = 0; statIncorrect = 0;
   document.getElementById('statCorrect').textContent = '0';
   document.getElementById('statIncorrect').textContent = '0';
+  document.getElementById('statTimer').textContent = '0:00';
   
   fullSet = Array.from(selected).map(k => {
     const [r,c] = k.split('-').map(Number);
@@ -276,6 +306,7 @@ document.getElementById('startBtn').onclick = () => {
   deck = [...fullSet].sort(() => Math.random() - 0.5);
   document.getElementById('selectionScreen').classList.add('hidden');
   document.getElementById('flashScreen').classList.remove('hidden');
+  startTimer();
   drawNextCard();
 };
 
@@ -283,25 +314,44 @@ function drawNextCard() {
   if (deck.length === 0) { deck = [...fullSet].sort(() => Math.random() - 0.5); }
   current = deck.shift();
   document.getElementById('bigKana').textContent = current.kana;
-  document.getElementById('answerInput').value = '';
-  document.getElementById('answerInput').focus();
+  const input = document.getElementById('answerInput');
+  input.value = '';
+  input.disabled = false;
+  input.focus();
   document.getElementById('status').textContent = '';
 }
 
 document.getElementById('answerInput').onkeydown = (e) => {
+  const input = e.target;
+  if(e.code === 'Space' && input.value === '') {
+    e.preventDefault();
+    statIncorrect++;
+    missedChars.add(current.key);
+    document.getElementById('status').textContent = `Answer: ${current.answers[0]}`;
+    document.getElementById('status').style.color = '#555';
+    document.getElementById('statIncorrect').textContent = statIncorrect;
+    const insertAt = Math.min(deck.length, 3);
+    deck.splice(insertAt, 0, current);
+    setTimeout(() => { document.getElementById('status').textContent = ''; }, 1000);
+    return;
+  }
   if(e.key === 'Enter') {
-    const val = e.target.value.toLowerCase().trim();
+    const val = input.value.toLowerCase().trim();
     if(current.answers.includes(val)) {
       statCorrect++;
-      missedChars.delete(current.key);
       document.getElementById('status').textContent = '✅ Correct!';
       document.getElementById('status').style.color = 'green';
-      setTimeout(drawNextCard, 500);
+      input.disabled = true;
+      setTimeout(drawNextCard, 300);
     } else {
       statIncorrect++;
       missedChars.add(current.key);
       document.getElementById('status').textContent = `❌ It's ${current.answers[0]}`;
       document.getElementById('status').style.color = 'red';
+      setTimeout(() => {
+          input.value = ''; 
+          document.getElementById('status').textContent = '';
+      }, 500);
       const insertAt = Math.min(deck.length, 3);
       deck.splice(insertAt, 0, current);
     }
@@ -311,20 +361,21 @@ document.getElementById('answerInput').onkeydown = (e) => {
 };
 
 function finishSession() {
+  const timeStr = stopTimer();
   const total = statCorrect + statIncorrect;
   if (total > 0) {
     const acc = Math.round((statCorrect / total) * 100);
     document.getElementById('summaryStats').innerHTML = `
+      <b>Correct:</b> ${statCorrect}<br>
+      <b>Incorrect:</b> ${statIncorrect}<br>
+      <b>Total Tries:</b> ${total}<br>
       <b>Accuracy:</b> ${acc}%<br>
-      <b>Incorrect:</b> ${statIncorrect} items<br>
-      <b>Total Tries:</b> ${total}
+      <b>Time Practiced:</b> ${timeStr}
     `;
-    if (missedChars.size > 0) document.getElementById('selectWeakBtn').classList.remove('hidden');
-  } else {
-    document.getElementById('selectWeakBtn').classList.add('hidden');
   }
   document.getElementById('flashScreen').classList.add('hidden');
   document.getElementById('selectionScreen').classList.remove('hidden');
+  updateCounts();
   renderChart(); 
 }
 

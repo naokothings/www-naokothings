@@ -7,28 +7,30 @@
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
         .last-update { font-size: 0.8em; color: #666; margin-bottom: 20px; }
-        nav { text-align: center; margin-bottom: 40px; font-weight: bold; }
+        nav { text-align: center; margin-bottom: 40px; font-weight: bold; position: sticky; top: 0; background: white; padding: 10px 0; border-bottom: 1px solid #eee; z-index: 100; }
         nav a { text-decoration: none; color: #007AFF; margin: 0 5px; }
         h1, h2 { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 40px; }
+        h3 { margin-left: -20px; color: #555; margin-top: 30px; }
         .summary-list { list-style-type: disc; padding-left: 20px; }
         details { margin-top: 5px; cursor: pointer; color: #555; font-size: 0.9em; }
-        .ingredients { background: #f9f9f9; padding: 10px; border-radius: 5px; margin-top: 5px; word-break: break-word; }
+        .ingredients { background: #f9f9f9; padding: 10px; border-radius: 5px; margin-top: 5px; word-break: break-word; font-family: monospace; font-size: 0.85em; }
         .pic-grid { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; }
         .pic-item { flex: 1 1 calc(33.333% - 15px); min-width: 200px; text-align: center; }
         .pic-item img { width: 100%; border-radius: 8px; border: 1px solid #ddd; }
         .pic-caption { font-size: 0.85em; margin-top: 5px; color: #444; }
-        .timeline-date { font-size: 1.2em; font-weight: bold; margin-top: 25px; margin-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .timeline-date { font-size: 1.25em; font-weight: bold; margin-top: 30px; margin-bottom: 10px; color: #000; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
         th { background-color: #f2f2f2; }
         .status-not-taken { color: #d93025; font-weight: bold; }
         .status-using { color: #188038; font-weight: bold; }
+        .alert { color: #d93025; font-weight: bold; }
         @media (max-width: 600px) { .pic-item { flex: 1 1 100%; } }
     </style>
 </head>
 <body>
 
-    <div class="last-update">Last update: March 27, 2026 ~ 1:00pm</div>
+    <div class="last-update">Last update: March 28, 2026 - 9:25am</div>
 
     <nav>
         <a href="#summary">SUMMARY</a> | 
@@ -39,43 +41,56 @@
 
     <h2 id="summary">SUMMARY</h2>
     <ul class="summary-list">
-        <li><a href="https://www.amazon.com/Medicube-AGE-R-Glutathione-Glow-Serum/dp/B0CN646H8X" target="_blank">Medicube Glow Serum</a> on Sunday March 22nd
+        <li><strong>Today, March 28:</strong>
+            <ul>
+                <li class="alert">Irritation has reached right eye; eye is burning but not red.</li>
+                <li class="alert">Red rash has reached the inner corner and waterline of the eye.</li>
+                <li>🔴 Under jaw line on the right side: lymph node is swollen and sore.</li>
+                <li>Burning and tingling continues by nose, upper lip, lip, gums, and teeth on the right side.</li>
+                <li>Eye and face burning sensation persisted all night.</li>
+            </ul>
+        </li>
+        <li><strong>March 27th Symptoms (Previous):</strong>
+            <ul>
+                <li>Unilateral pain on the right side.</li>
+                <li>Lesion on right side of nose that is weeping.</li>
+                <li>Small blisters on upper lip, lip, and gums (all on the right side).</li>
+                <li>Lump and soreness on right side of neck.</li>
+                <li>Right eye burning and soreness.</li>
+                <li>Right upper teeth sensitivity.</li>
+            </ul>
+        </li>
+        <li><strong>Diagnosis Notes:</strong> 
+            <ul>
+                <li>Dr. Andrew Calman (Ophthalmology) strongly suspects <strong>V2 Zoster (Shingles)</strong>.</li>
+                <li>UCSF Go Health originally suspected Staph/Impetigo.</li>
+                <li>Go Health Virtual originally suspected HSV-1.</li>
+            </ul>
+        </li>
+        <li><a href="https://www.amazon.com/Medicube-AGE-R-Glutathione-Glow-Serum/dp/B0CN646H8X" target="_blank">Medicube Glow Serum</a> (Used Mar 22nd)
             <details>
-                <summary>See ingredients</summary>
+                <summary>▶ See ingredients</summary>
                 <div class="ingredients">Water, Glycerin, PEG-8, Niacinamide, Butylene Glycol, Methylpropanediol, 1,2-Hexanediol, Betaine, Glycereth-26,m Bis-PEG-18 Methyl Ether Dimethyl Silane, Polyglyceryl-10 Laurate, Bifida Ferment Lysate, Methyl Gluceth-20, Panthenol, Squalane, Glucosylrutin, Hydrogenated Lecithin, Carbomer, Caprylic/Capric Triglyceride, Tromethamine, Xanthan Gum, Propanediol, Flavor, Ethylhexylglycerin, Glutathione(500ppm), Adenosine, Ceramide NP, Sodium Phytate, Benzyl Glycol, Hydrolyzed Glycosaminoglycans, Sodium Hyaluronate, Dextrin, Theobroma Cacao (Cocoa) Extract, Beta-Glucan, Cyanocobalamin, Sodium Hyaluronate Crosspolymer, Tocopherol, Hydrolyzed Hyaluronic Acid, Hydroxypropyltrimonium Hyaluronate, Soluble Collagen, Hyaluronic Acid, Sodium Acetylated Hyaluronate, Sodium Stearoyl Glutamate</div>
             </details>
         </li>
-        <li>March 23rd, Monday - lesion on right side of nose</li>
-        <li>Today, March 27th - we are at:
-            <ul>
-                <li>Unilateral pain on the right side</li>
-                <li>Lesion on right side of nose that is weeping</li>
-                <li>Small blisters on upper lip, lip, and gums (all on the right side)</li>
-                <li>Lump and soreness on right side of neck</li>
-                <li>Right eye burning and soreness</li>
-                <li>Right upper teeth sensitivity</li>
-                <li>Waiting on Valacyclovir prescription to be filled</li>
-            </ul>
-        </li>
     </ul>
-    <p>To read more, see <a href="#timeline">Timeline</a>.</p>
 
     <h2 id="pics">PICS 📷</h2>
-    
-    <h3>March 24th, 2026 - Tuesday</h3>
+
+    <h3 style="margin-left: -15px;">March 24, 2026 - Tuesday</h3>
     <div class="pic-grid">
         <div class="pic-item"><img src="owmyface_files/20260324t_818am.png"><div class="pic-caption">8:18am</div></div>
         <div class="pic-item"><img src="owmyface_files/20260324t_914pm.png"><div class="pic-caption">9:14pm</div></div>
     </div>
 
-    <h3>March 25, 2026 - Wednesday</h3>
+    <h3 style="margin-left: -15px;">March 25, 2026 - Wednesday</h3>
     <div class="pic-grid">
         <div class="pic-item"><img src="owmyface_files/20260325w_10am.png"><div class="pic-caption">10am</div></div>
         <div class="pic-item"><img src="owmyface_files/20260325w_752pm.png"><div class="pic-caption">7:52pm</div></div>
         <div class="pic-item"><img src="owmyface_files/20260325w_915pm.png"><div class="pic-caption">9:15pm</div></div>
     </div>
 
-    <h3>March 26, 2026 - Thursday</h3>
+    <h3 style="margin-left: -15px;">March 26, 2026 - Thursday</h3>
     <div class="pic-grid">
         <div class="pic-item"><img src="owmyface_files/20260326th_801am-lip.png"><div class="pic-caption">8:01am lip</div></div>
         <div class="pic-item"><img src="owmyface_files/20260326th_801am.png"><div class="pic-caption">8:01am</div></div>
@@ -84,77 +99,77 @@
         <div class="pic-item"><img src="owmyface_files/20260326th_1013pm-lip.png"><div class="pic-caption">10:13pm</div></div>
     </div>
 
-    <h3>March 27, 2026 - Friday</h3>
+    <h3 style="margin-left: -15px;">March 27, 2026 - Friday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260327f_0827am_all.png"><div class="pic-caption">8:27am</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260327f_0827am_all.png"><div class="pic-caption">8:27AM - All</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260327f_1822.png"><div class="pic-caption">6:22PM 👁️</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260327f_2100.png"><div class="pic-caption">9:00PM</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260327f_2100-02.png"><div class="pic-caption">9:00PM (Lip)</div></div>
+    </div>
+
+    <h3 style="margin-left: -15px;">March 28, 2026 - Saturday</h3>
+    <div class="pic-grid">
+        <div class="pic-item"><img src="owmyface_files/20260328sa_626am.png"><div class="pic-caption">6:26AM</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260328sa_0828am-nose.png"><div class="pic-caption">8:28AM (Nose)</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260328sa_0828am-lip.png"><div class="pic-caption">8:28AM (Lip)</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260328sa_0828am-eye.png"><div class="pic-caption">8:28AM (Eye)</div></div>
     </div>
 
     <h2 id="timeline">TIMELINE</h2>
-    
+
     <div class="timeline-date">March 22nd - Sunday (Day 0)</div>
     <ul>
-        <li>Used new <a href="https://www.amazon.com/Medicube-AGE-R-Glutathione-Glow-Serum/dp/B0CN646H8X" target="_blank">Medicube serum</a> (with glutathione) in the PM</li>
+        <li>Used <a href="https://www.amazon.com/Medicube-AGE-R-Glutathione-Glow-Serum/dp/B0CN646H8X" target="_blank">Medicube serum</a> in the PM.</li>
     </ul>
 
-    <div class="timeline-date">March 23rd - Monday (Day 1)</div>
+    <div class="timeline-date">March 23 (Day 1)</div>
     <ul>
-        <li>Woke up with irritation and small lesion on right side of nose (slightly painful and burning)</li>
-        <li>Small additional red spot appeared on tip of nose, gone by next day</li>
-        <li>Used gentle cleanser, moisturizer, spf</li>
+        <li>🔴 Woke up with irritation and small lesion on right side of nose (painful/burning).</li>
+        <li>Small red spot on tip of nose (gone by next day).</li>
+        <li>Used gentle cleanser, moisturizer, SPF.</li>
     </ul>
 
-    <div class="timeline-date">March 24th - Tuesday (Day 2)</div>
+    <div class="timeline-date">March 24 (Day 2)</div>
     <ul>
-        <li>Nose fold area worsened: red, clustered bumps, tender</li>
-        <li>Applied Vaseline to protect/heal in AM and PM</li>
+        <li>Nose fold area worsened: red, clustered bumps, tender.</li>
+        <li>Applied Vaseline to protect/heal in AM and PM.</li>
     </ul>
 
-    <div class="timeline-date">March 25th - Wednesday (Day 3)</div>
-    <p><strong>AM:</strong></p>
+    <div class="timeline-date">March 25 (Day 3)</div>
     <ul>
-        <li>New sensations (right side): upper lip felt dry/chapped, upper gum felt sore</li>
-        <li>Nose area still inflamed</li>
-        <li>Eye felt dry/tired (end-of-cycle contacts)</li>
-    </ul>
-    <p><strong>PM:</strong></p>
-    <ul>
-        <li>Nose area began weeping (white/clear fluid); cleaned with q-tip</li>
-        <li>Took Advil</li>
-        <li>Applied Abreva</li>
+        <li><strong>AM:</strong> New sensations (right side): 🔴 upper lip dry/chapped, upper gum sore. Nose inflamed. Eye felt dry/tired.</li>
+        <li><strong>PM:</strong> Nose area began weeping (white/clear fluid). Removed contacts. Took Advil. Applied Abreva.</li>
     </ul>
 
     <div class="timeline-date">March 26 (Day 4)</div>
     <ul>
-        <li>Pain slightly less, but tingling and electrical/crackling feeling around nose, upper lip, eye, and nose (all on right side)</li>
-        <li>Applied Abreva in AM</li>
-        <li>Saw Dr. Chelsea Sumulong at <a href="https://www.sutterhealth.org/find-provider/chelsea-e.-sumulong-2020192531" target="_blank">899 Valencia</a>
-            <ul>
-                <li>Prescribed Oxcarbazepine 300mg (Suspects Trigeminal Neuropathy/Neuralgia)</li>
-                <li>Referral to ophthalmologist</li>
-            </ul>
-        </li>
-        <li>Visited UCSF Go Health Urgent Care (North Beach)
-            <ul>
-                <li>PCR swab taken</li>
-                <li>Suspects Staph infection (Impetigo); Prescribed Mupirocin 2%</li>
-            </ul>
-        </li>
-        <li>Bumps appeared on gums and lip (upper right side)</li>
-        <li>Applied Mupirocin; <strong>DID NOT</strong> take Oxcarbazepine</li>
+        <li>🔴 Tingling/electrical crackling around right side face, lip, eye.</li>
+        <li>Visited <a href="https://www.sutterhealth.org/find-provider/chelsea-e.-sumulong-2020192531" target="_blank">Dr. Chelsea Sumulong</a> and UCSF Go Health Urgent Care - Gabriel Smith.</li>
+        <li>PCR swab taken by go health (Gabriel Smith); suspects Staph infection (Impetigo); 💊 prescribed Mupirocin 2%.</li>
+        <li>🔴 Bumps appeared on gums and lip (upper right side).</li>
     </ul>
 
- <div class="timeline-date">March 27 (Day 5)</div>
+    <div class="timeline-date">March 27 (Day 5)</div>
     <ul>
-        <li>Right side neck is sore with a lump (possible lymph node)</li>
-        <li>Blisters persist on gums and lip</li>
-        <li>Right eye continues to burn and is sore</li>
-        <li>Applied Mupirocin 2%</li>
-        <li><strong>Go Health Virtual Exam:</strong> Shared website and photos with provider. 
+        <li>🔴 Right side neck sore/lump; blisters on gums, lip, and upper lip.</li>
+        <li>Go Health Virtual Exam with Katelin Erickson: HSV-1 diagnosis, prescribed Valacyclovir.</li>
+        <li><strong>Ophthalmology Visit: <a href="https://www.sutterhealth.org/find-provider/dr-andrew-f-calman-1046232932" target="_blank">Dr. Andrew Calman</a></strong>
             <ul>
-                <li><strong>Diagnosis:</strong> HSV-1</li>
-                <li><strong>Prescribed:</strong> Valacyclovir</li>
+                <li><strong>Diagnosis:</strong> Strongly suspects <strong>V2 Zoster (Shingles)</strong>.</li>
+                <li><strong>Eye Exam:</strong> Dilated; results **NORMAL**.</li>
+                <li><strong>Meds:</strong> 💊 Increased Valacyclovir to 1g (3x/daily). Started at 6:37PM.</li>
             </ul>
         </li>
+        <li>🔴 Red bumpiness creeping toward eye; right eye burning.</li>
+        <li>🔴 Right upper teeth sensitivity.</li>
+    </ul>
+
+    <div class="timeline-date">March 28 (Day 6)</div>
+    <ul>
+        <li>Face and eye burning persisted all night.</li>
+        <li>Rash hit inner corner and waterline of right eye.</li>
+        <li>Swollen and sore lymph node under right jaw.</li>
+        <li>Continuing Valacyclovir 1g (3x daily).</li>
     </ul>
 
     <h2 id="meds">MEDS & Action Items</h2>
@@ -170,13 +185,13 @@
         <tbody>
             <tr>
                 <td>March 27</td>
-                <td>Go Health (Virtual)</td>
-                <td><strong>Valacyclovir</strong></td>
-                <td class="status-using">PRESCRIBED, waiting for fulfillment</td>
+                <td>Dr. Andrew Calman</td>
+                <td><strong>Valacyclovir 1g (3x daily)</strong></td>
+                <td class="status-using">Started 6:37PM</td>
             </tr>
             <tr>
                 <td>March 26</td>
-                <td>UCSF Go Health - Gabriel Smith</td>
+                <td>UCSF Go Health</td>
                 <td>Mupirocin 2%</td>
                 <td class="status-using">USING</td>
             </tr>
@@ -188,6 +203,11 @@
             </tr>
         </tbody>
     </table>
+
+    <p><strong>Pending Items:</strong></p>
+    <ul>
+        <li>PCR swab results from UCSF Go Health (taken Mar 26).</li>
+    </ul>
 
 </body>
 </html>

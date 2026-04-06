@@ -16,8 +16,16 @@
         details { margin-top: 5px; cursor: pointer; color: #555; font-size: 0.9em; }
         .ingredients { background: #f9f9f9; padding: 10px; border-radius: 5px; margin-top: 5px; word-break: break-word; font-family: monospace; font-size: 0.85em; }
         .pic-grid { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; }
-        .pic-item { flex: 1 1 calc(33.333% - 15px); min-width: 200px; text-align: center; }
-        .pic-item img { width: 100%; border-radius: 8px; border: 1px solid #ddd; }
+        .pic-item { flex: 0 1 180px; text-align: center; }
+        .pic-item img {
+            width: 100%;
+            max-width: 180px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .pic-item img:hover { transform: scale(1.03); }
         .pic-caption { font-size: 0.85em; margin-top: 5px; color: #444; }
         .timeline-date { font-size: 1.25em; font-weight: bold; margin-top: 30px; margin-bottom: 10px; color: #000; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; }
@@ -28,7 +36,40 @@
         .status-confirmed { color: #0206f2; font-weight: bold; }
         .status-pending { color: #e37400; font-weight: bold; }
         .alert { color: #d93025; font-weight: bold; }
-        @media (max-width: 600px) { .pic-item { flex: 1 1 100%; } }
+
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .lightbox.active { display: flex; }
+        .lightbox img {
+            max-width: 95vw;
+            max-height: 90vh;
+            width: auto;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.4);
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 16px;
+            right: 24px;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        @media (max-width: 600px) {
+            .pic-item { flex: 1 1 100%; }
+        }
     </style>
 </head>
 <body>
@@ -104,113 +145,113 @@
 
     <h3 style="margin-left: -15px;">March 24, 2026 - Tuesday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260324t_818am.png"><div class="pic-caption">8:18am</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260324t_914pm.png"><div class="pic-caption">9:14pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260324t_818am.png" alt="March 24, 2026 - 8:18am" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">8:18am</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260324t_914pm.png" alt="March 24, 2026 - 9:14pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">9:14pm</div></div>
     </div>
 
     <h3 style="margin-left: -15px;">March 25, 2026 - Wednesday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260325w_10am.png"><div class="pic-caption">10am</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260325w_752pm.png"><div class="pic-caption">7:52pm</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260325w_915pm.png"><div class="pic-caption">9:15pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260325w_10am.png" alt="March 25, 2026 - 10am" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10am</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260325w_752pm.png" alt="March 25, 2026 - 7:52pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">7:52pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260325w_915pm.png" alt="March 25, 2026 - 9:15pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">9:15pm</div></div>
     </div>
 
     <h3 style="margin-left: -15px;">March 26, 2026 - Thursday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260326th_801am-lip.png"><div class="pic-caption">8:01am lip</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260326th_801am.png"><div class="pic-caption">8:01am</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260326th_1218pm-oozelipbumps.png"><div class="pic-caption">12:18pm</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260326th_324pm-gumbumps.png"><div class="pic-caption">3:24pm</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260326th_1013pm-lip.png"><div class="pic-caption">10:13pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260326th_801am-lip.png" alt="March 26, 2026 - 8:01am lip" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">8:01am lip</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260326th_801am.png" alt="March 26, 2026 - 8:01am" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">8:01am</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260326th_1218pm-oozelipbumps.png" alt="March 26, 2026 - 12:18pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">12:18pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260326th_324pm-gumbumps.png" alt="March 26, 2026 - 3:24pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">3:24pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260326th_1013pm-lip.png" alt="March 26, 2026 - 10:13pm lip" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:13pm</div></div>
     </div>
 
     <h3 style="margin-left: -15px;">March 27, 2026 - Friday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260327f_0827am_all.png"><div class="pic-caption">8:27AM - All</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260327f_1822.png"><div class="pic-caption">6:22PM 👁️</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260327f_2100.png"><div class="pic-caption">9:00PM</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260327f_2100-02.png"><div class="pic-caption">9:00PM (Lip)</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260327f_0827am_all.png" alt="March 27, 2026 - 8:27am all" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">8:27AM - All</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260327f_1822.png" alt="March 27, 2026 - 6:22pm eye" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">6:22PM 👁️</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260327f_2100.png" alt="March 27, 2026 - 9:00pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">9:00PM</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260327f_2100-02.png" alt="March 27, 2026 - 9:00pm lip" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">9:00PM (Lip)</div></div>
     </div>
 
     <h3 style="margin-left: -15px;">March 28, 2026 - Saturday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260328sa_626am.png"><div class="pic-caption">6:26AM</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260328sa_1832pm.png"><div class="pic-caption">6:32pm</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260328sa_2213pm-lip.png"><div class="pic-caption">10:13pm (Lip)</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260328sa_2213pm.png"><div class="pic-caption">10:30pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260328sa_626am.png" alt="March 28, 2026 - 6:26am" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">6:26AM</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260328sa_1832pm.png" alt="March 28, 2026 - 6:32pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">6:32pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260328sa_2213pm-lip.png" alt="March 28, 2026 - 10:13pm lip" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:13pm (Lip)</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260328sa_2213pm.png" alt="March 28, 2026 - 10:30pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:30pm</div></div>
     </div>
 
     <h3 style="margin-left: -15px;">March 29, 2026 - Sunday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260329su_0816am.png"><div class="pic-caption">8:16am</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260329su_0935am.png"><div class="pic-caption">9:35am</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260329su_2212-eye.png"><div class="pic-caption">10:12pm - eye</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260329su_2212-nose.png"><div class="pic-caption">10:12pm - nose</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260329su_2212-wholeface.png"><div class="pic-caption">10:12pm - face</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260329su_0816am.png" alt="March 29, 2026 - 8:16am" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">8:16am</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260329su_0935am.png" alt="March 29, 2026 - 9:35am" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">9:35am</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260329su_2212-eye.png" alt="March 29, 2026 - 10:12pm eye" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:12pm - eye</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260329su_2212-nose.png" alt="March 29, 2026 - 10:12pm nose" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:12pm - nose</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260329su_2212-wholeface.png" alt="March 29, 2026 - 10:12pm face" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:12pm - face</div></div>
     </div>
 
     <h3 style="margin-left: -15px;">March 30, 2026 - Monday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260330m_0923.png"><div class="pic-caption">9:23am</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260330m_2200.png"><div class="pic-caption">10:00pm</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260330m_2200-nose.png"><div class="pic-caption">10:00pm - nose</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260330m_0923.png" alt="March 30, 2026 - 9:23am" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">9:23am</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260330m_2200.png" alt="March 30, 2026 - 10:00pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:00pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260330m_2200-nose.png" alt="March 30, 2026 - 10:00pm nose" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:00pm - nose</div></div>
     </div>
 
     <h3 style="margin-left: -15px;">March 31, 2026 - Tuesday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260331t_0939.png"><div class="pic-caption">9:39am</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260331t_0939-side.png"><div class="pic-caption">9:39am - side</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260331t_2043-nose.png"><div class="pic-caption">10:30pm - nose</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260331t_2043-side.png"><div class="pic-caption">10:43pm - side</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260331t_2043.png"><div class="pic-caption">10:43pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260331t_0939.png" alt="March 31, 2026 - 9:39am" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">9:39am</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260331t_0939-side.png" alt="March 31, 2026 - 9:39am side" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">9:39am - side</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260331t_2043-nose.png" alt="March 31, 2026 - 10:30pm nose" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:30pm - nose</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260331t_2043-side.png" alt="March 31, 2026 - 10:43pm side" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:43pm - side</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260331t_2043.png" alt="March 31, 2026 - 10:43pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:43pm</div></div>
     </div>
 
     <h3 style="margin-left: -15px;">April 1, 2026 - Wednesday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260401w_0840.png"><div class="pic-caption">8:40am</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260401w_0840-side.png"><div class="pic-caption">8:40am - side</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260401w_0816.png"><div class="pic-caption">8:16am - nose (before shower)</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260401w_2228-nose.png"><div class="pic-caption">10:28pm - nose</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260401w_2228-side.png"><div class="pic-caption">10:28pm - side</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260401w_2228.png"><div class="pic-caption">10:28pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260401w_0840.png" alt="April 1, 2026 - 8:40am" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">8:40am</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260401w_0840-side.png" alt="April 1, 2026 - 8:40am side" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">8:40am - side</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260401w_0816.png" alt="April 1, 2026 - 8:16am nose before shower" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">8:16am - nose (before shower)</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260401w_2228-nose.png" alt="April 1, 2026 - 10:28pm nose" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:28pm - nose</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260401w_2228-side.png" alt="April 1, 2026 - 10:28pm side" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:28pm - side</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260401w_2228.png" alt="April 1, 2026 - 10:28pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:28pm</div></div>
     </div>
 
     <h3 style="margin-left: -15px;">April 2, 2026 - Thursday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260402th_0932.png"><div class="pic-caption">9:32am</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260402th_0932-side.png"><div class="pic-caption">9:32am - side</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260402th_2235.png"><div class="pic-caption">10:35pm</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260402th_2235-side.png"><div class="pic-caption">10:35pm - side</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260402th_0932.png" alt="April 2, 2026 - 9:32am" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">9:32am</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260402th_0932-side.png" alt="April 2, 2026 - 9:32am side" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">9:32am - side</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260402th_2235.png" alt="April 2, 2026 - 10:35pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:35pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260402th_2235-side.png" alt="April 2, 2026 - 10:35pm side" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:35pm - side</div></div>
     </div>
 
     <h3 style="margin-left: -15px;">April 3, 2026 - Friday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260403f_0929.png"><div class="pic-caption">9:29am</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260403f_0929-side.png"><div class="pic-caption">9:29am - side</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260403f_2246.png"><div class="pic-caption">10:46pm</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260403f_2246-side.png"><div class="pic-caption">10:46pm - side</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260403f_0929.png" alt="April 3, 2026 - 9:29am" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">9:29am</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260403f_0929-side.png" alt="April 3, 2026 - 9:29am side" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">9:29am - side</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260403f_2246.png" alt="April 3, 2026 - 10:46pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:46pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260403f_2246-side.png" alt="April 3, 2026 - 10:46pm side" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:46pm - side</div></div>
     </div>
 
     <h3 style="margin-left: -15px;">April 4, 2026 - Saturday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260404sa_0946.png"><div class="pic-caption">9:46am</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260404sa_0946-side.png"><div class="pic-caption">9:46am - side</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260404sa_2215.png"><div class="pic-caption">10:15pm</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260404sa_2215-side.png"><div class="pic-caption">10:15pm - side</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260404sa_0946.png" alt="April 4, 2026 - 9:46am" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">9:46am</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260404sa_0946-side.png" alt="April 4, 2026 - 9:46am side" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">9:46am - side</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260404sa_2215.png" alt="April 4, 2026 - 10:15pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:15pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260404sa_2215-side.png" alt="April 4, 2026 - 10:15pm side" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:15pm - side</div></div>
     </div>
 
     <h3 style="margin-left: -15px;">April 5, 2026 - Sunday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260405su_1022.png"><div class="pic-caption">10:22am</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260405su_1022-side.png"><div class="pic-caption">10:22am - side</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260405su_2207.png"><div class="pic-caption">10:07pm</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260405su_2207-side.png"><div class="pic-caption">10:07pm - side</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260405su_1022.png" alt="April 5, 2026 - 10:22am" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:22am</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260405su_1022-side.png" alt="April 5, 2026 - 10:22am side" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:22am - side</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260405su_2207.png" alt="April 5, 2026 - 10:07pm" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:07pm</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260405su_2207-side.png" alt="April 5, 2026 - 10:07pm side" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">10:07pm - side</div></div>
     </div>
 
     <h3 style="margin-left: -15px;">April 6, 2026 - Monday</h3>
     <div class="pic-grid">
-        <div class="pic-item"><img src="owmyface_files/20260406m_0836.png"><div class="pic-caption">8:36am</div></div>
-        <div class="pic-item"><img src="owmyface_files/20260406m_0836-side.png"><div class="pic-caption">8:36am - side</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260406m_0836.png" alt="April 6, 2026 - 8:36am" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">8:36am</div></div>
+        <div class="pic-item"><img src="owmyface_files/20260406m_0836-side.png" alt="April 6, 2026 - 8:36am side" onclick="openLightbox(this.src, this.alt)"><div class="pic-caption">8:36am - side</div></div>
     </div>
 
     <h2 id="timeline">TIMELINE</h2>
@@ -334,82 +375,112 @@
         <li>Higher pain today, and exhaustion</li>
     </ul>
 
-        <div class="timeline-date">April 2nd - Friday (Day 12)</div>
+    <div class="timeline-date">April 2nd - Friday (Day 12)</div>
     <ul>     
         <li>Strong scalp pain and radiating pain when coughing</li>
         <li>Appointment w/Dr. Calman - everything is good</li>
-            <ul>
-                <li>Asked about Gabapentin, he referred me back to primary care</li>
-                <li>No contact lenses until sloughing is complete</li>
-            </ul>
+        <ul>
+            <li>Asked about Gabapentin, he referred me back to primary care</li>
+            <li>No contact lenses until sloughing is complete</li>
+        </ul>
         <li>Sent a message to Chelsea Sumolong requesting Gabapentin or some kind of pain relief</li>
         <li>Nurse called me, went over symptoms, she is sending something to 899 Valencia suggesting Gabapentin/some kind of pain relief</li>
-            <ul>    
-                <li>Probably didn't get there in time, no response. Maybe Monday</li>
-            </ul>
+        <ul>    
+            <li>Probably didn't get there in time, no response. Maybe Monday</li>
+        </ul>
     </ul>
 
-        <div class="timeline-date">April 4th & 5th - Saturday (Day 13) & Sunday (Day 14)</div>
+    <div class="timeline-date">April 4th & 5th - Saturday (Day 13) & Sunday (Day 14)</div>
     <ul>     
         <li>Redness lessening slowly</li>
         <li>Pain continues</li>
     </ul>
 
     <h2 id="meds">MEDS & Action Items</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Provider</th>
+                <th>Prescription</th>
+                <th>Status</th>
+                <th>Started</th>
+                <th>Completed</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>April 3</td>
+                <td>Sutter Health Nurse</td>
+                <td>Gabapentin? (unconfirmed)</td>
+                <td class="status-pending">Awaiting 899 Valencia approval</td>
+                <td>No</td>
+                <td>No</td>
+            </tr>
+            <tr>
+                <td>March 28</td>
+                <td>UCSF Go Health (NP)</td>
+                <td><strong>Doxycycline 100mg (2x daily)</strong></td>
+                <td>Completed</td>
+                <td>Mar 28, 10PM</td>
+                <td>Apr 4</td>
+            </tr>
+            <tr>
+                <td>March 27</td>
+                <td>Dr. Andrew Calman</td>
+                <td><strong>Valacyclovir 1g (3x daily)</strong></td>
+                <td class="status-using">Using</td>
+                <td>Mar 27, 6:37PM</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>March 26</td>
+                <td>UCSF Go Health (PA)</td>
+                <td>Mupirocin 2%</td>
+                <td class="status-using">USING</td>
+                <td>Yes — Mar 26</td>
+                <td>No</td>
+            </tr>
+            <tr>
+                <td>March 26</td>
+                <td>Chelsea Sumulong (PA)</td>
+                <td>Oxcarbazepine 300mg</td>
+                <td class="status-not-taken">NOT TAKEN</td>
+                <td>No</td>
+                <td>No</td>
+            </tr>
+        </tbody>
+    </table>
 
-<table>
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Provider</th>
-            <th>Prescription</th>
-            <th>Status</th>
-            <th>Started</th>
-            <th>Completed</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>April 3</td>
-            <td>Sutter Health Nurse</td>
-            <td>Gabapentin? (unconfirmed)</td>
-            <td class="status-pending">Awaiting 899 Valencia approval</td>
-            <td>No</td>
-            <td>No</td>
-        </tr>
-        <tr>
-            <td>March 28</td>
-            <td>UCSF Go Health (NP)</td>
-            <td><strong>Doxycycline 100mg (2x daily)</strong></td>
-            <td>Completed</td>
-            <td>Mar 28, 10PM</td>
-            <td>Apr 4</td>
-        </tr>
-        <tr>
-            <td>March 27</td>
-            <td>Dr. Andrew Calman</td>
-            <td><strong>Valacyclovir 1g (3x daily)</strong></td>
-            <td class="status-using">Using</td>
-            <td>Mar 27, 6:37PM</td>
-            <td>-</td>
-        </tr>
-        <tr>
-            <td>March 26</td>
-            <td>UCSF Go Health (PA)</td>
-            <td>Mupirocin 2%</td>
-            <td class="status-using">USING</td>
-            <td>Yes — Mar 26</td>
-            <td>No</td>
-        </tr>
-        <tr>
-            <td>March 26</td>
-            <td>Chelsea Sumulong (PA)</td>
-            <td>Oxcarbazepine 300mg</td>
-            <td class="status-not-taken">NOT TAKEN</td>
-            <td>No</td>
-            <td>No</td>
-        </tr>
-    </tbody>
-</table>
+    <p><strong>Pending Items:</strong></p>
+    <ul>
+        <li>None.</li>
+    </ul>
+
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <img id="lightbox-img" src="" alt="">
+    </div>
+
+    <script>
+        function openLightbox(src, alt) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = src;
+            lightboxImg.alt = alt || '';
+            lightbox.classList.add('active');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+    </script>
+
 </body>
 </html>

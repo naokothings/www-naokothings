@@ -1,1 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Create custom flash cards and study them in randomized sessions.">
+  <title>Flash Card Maker | Just Naoko Things</title>
+  <style>
+    :root{--ivory:#D1EDFF;--paper:#fffdf9;--navy:#101d3b;--blue:#1757d7;--blue-dark:#1047b8;--muted:#626a79;--line:#d2cabd;--red:#c8483c;--green:#18794e}
+    *{box-sizing:border-box}html{background:var(--ivory)}body{margin:0;background:var(--ivory);color:var(--navy);font-family:Arial,Helvetica,sans-serif}button,textarea,input{font:inherit}button{cursor:pointer}
+    .builder-screen{min-height:100vh;padding:0 4vw 64px}.builder-header{height:104px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:32px;position:relative}.brand{color:var(--navy);font-family:Georgia,serif;font-size:28px;font-weight:700;text-decoration:none}.clear-wrap{position:relative}.clear-all,.settings-button{border:2px solid var(--blue);background:transparent;color:var(--blue);border-radius:6px;font-weight:800;letter-spacing:.08em;transition:.16s ease}.clear-all{min-height:52px;padding:0 24px}.clear-all:hover,.settings-button:hover{background:#eaf0ff}.settings-button{width:52px;height:52px;margin-left:auto;font-size:24px}.clear-confirm{position:absolute;z-index:5;top:62px;left:0;width:260px;padding:18px;background:var(--paper);border:1px solid var(--line);box-shadow:0 12px 34px #101d3b1c;display:none;grid-template-columns:1fr 1fr;gap:10px;border-radius:6px}.clear-confirm.open{display:grid}.clear-confirm strong{grid-column:1/-1;font-family:Georgia,serif;font-size:21px}.clear-confirm button{border:1px solid var(--line);background:var(--paper);padding:9px;border-radius:4px}.clear-confirm .yes{background:var(--blue);border-color:var(--blue);color:#fff}.settings-panel{position:absolute;z-index:5;top:84px;right:0;width:270px;padding:24px;background:var(--paper);border:1px solid var(--line);box-shadow:0 12px 34px #101d3b1c;border-radius:6px;display:none}.settings-panel.open{display:block}.settings-panel h2{font-family:Georgia,serif;margin:0 0 18px}.settings-panel label{display:flex;align-items:center;gap:12px;padding:10px 0;font-weight:600}.settings-panel input{width:18px;height:18px;accent-color:var(--blue)}
+    .builder-layout{max-width:1330px;margin:46px auto 0}.deck-builder h1{font-family:Georgia,serif;font-size:clamp(52px,5vw,76px);line-height:1;letter-spacing:-.035em;margin:0;font-weight:500}.intro{color:var(--muted);font-size:20px;margin:20px 0 38px}.column-headings{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding-left:160px;font-size:15px;font-weight:800;letter-spacing:.08em;color:#4f5666;margin-bottom:14px}.column-headings.has-stat{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 220px}.card-row{display:grid;grid-template-columns:128px minmax(0,1fr) minmax(0,1fr);gap:24px;margin-bottom:18px;position:relative;align-items:start}.card-row.has-stat{grid-template-columns:128px minmax(0,1fr) minmax(0,1fr) 220px}.row-tools{min-height:58px;display:flex;align-items:center;gap:12px;color:var(--muted)}.delete-row,.drag-handle{border:0;background:transparent;width:34px;height:34px;border-radius:50%;display:grid;place-items:center}.delete-row{color:var(--red);font-size:35px;font-weight:300;line-height:1}.delete-row:hover{background:#f9e4df}.drag-handle{color:#747b89;font-size:23px;cursor:grab}.drag-handle:hover,.drag-handle:focus{background:#ebe5da;color:var(--navy)}.drag-handle:active{cursor:grabbing}.row-number{font-size:18px}.card-row textarea{resize:none;overflow:hidden;min-height:58px;width:100%;border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:14px 18px;color:#16191f;font-size:18px;line-height:1.55;outline:none;transition:border-color .15s,box-shadow .15s}.card-row textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #1757d722}.card-row textarea::placeholder{color:#868c99}.row-stat{min-height:58px;border-left:3px solid var(--blue);background:#fffdf9aa;padding:10px 14px;display:flex;flex-direction:column;justify-content:center;color:var(--muted);font-size:13px}.row-stat strong{color:var(--navy);font-size:18px}.session-summary{margin:0 0 28px 160px;border:1px solid var(--line);background:var(--paper);padding:16px 20px;display:flex;gap:28px;color:var(--muted)}.session-summary strong{color:var(--navy);font-size:20px;margin-right:4px}.begin-row{margin-left:160px;display:flex;align-items:center;gap:16px;color:var(--muted)}.begin{width:174px;height:72px;color:#fff;background:var(--blue);border:0;border-radius:6px;letter-spacing:.08em;font-weight:800;font-size:18px;transition:.16s ease}.begin:hover:not(:disabled){background:var(--blue-dark);transform:translateY(-1px)}.begin:disabled{opacity:.45;cursor:not-allowed}
+    .study-screen{min-height:100vh;display:none;flex-direction:column;padding:0 5vw 42px}.study-screen.active{display:flex}.study-top{min-height:92px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center}.mini-brand{font-weight:800;letter-spacing:.11em;font-size:13px}.timer{justify-self:center;border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:11px 22px;font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:.08em}.card-count{justify-self:end;color:var(--muted)}.study-workspace{width:min(1040px,100%);margin:auto;padding:54px 0}.prompt-card{background:var(--paper);border:1px solid var(--line);min-height:220px;padding:48px;display:grid;place-items:center;text-align:center;font:500 clamp(30px,4vw,54px)/1.25 Georgia,serif;box-shadow:0 10px 36px #101d3b0d}.answer-row{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:36px;align-items:end}.answer-side label{display:block;font-size:13px;font-weight:800;letter-spacing:.09em;color:var(--muted);margin-bottom:10px}.answer-side input,.revealed-answer>div{width:100%;min-height:72px;border:1px solid var(--line);background:var(--paper);padding:19px 22px;font-size:19px;border-radius:6px;color:#171a20}.answer-side input:focus{outline:3px solid #1757d722;border-color:var(--blue)}.answer-side input.correct{border:2px solid var(--green);background:#eefaf3;color:var(--green)}.answer-side input.wrong{border:2px solid var(--red);background:#fff2ef;color:var(--red)}.revealed-answer.correct-text>div{border:2px solid var(--green);background:#eefaf3;color:var(--green)}.revealed-answer{display:none}.space-hint{text-align:center;color:var(--blue);font-weight:700;margin:30px 0 0;display:none}.end-session{align-self:center;border:0;background:#6c7280;color:#fff;font-weight:800;letter-spacing:.08em;border-radius:5px;padding:16px 24px}.end-session:hover{background:#565c68}.hidden{display:none!important}
+    @media(max-width:900px){.card-row,.card-row.has-stat{grid-template-columns:70px 1fr;gap:14px}.card-row textarea{grid-column:2}.row-tools{grid-row:1/3}.row-stat{grid-column:2}.column-headings{display:none}.begin-row{margin-left:84px}.session-summary{margin-left:84px;flex-wrap:wrap}.answer-row{grid-template-columns:1fr}}
+    @media(max-width:560px){.builder-screen{padding:0 18px 40px}.builder-header{gap:10px}.brand{font-size:21px}.clear-all{padding:0 12px;font-size:12px}.card-row{grid-template-columns:48px 1fr}.row-tools{flex-direction:column;gap:3px}.row-number{display:none}.begin-row{margin-left:62px;flex-direction:column;align-items:flex-start}.study-screen{padding:0 18px 30px}.mini-brand,.card-count{font-size:10px}.prompt-card{padding:28px;min-height:180px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <main class="builder-screen" id="builderScreen">
+    <header class="builder-header">
+      <a class="brand" href="../">Flash Cards</a>
+      <div class="clear-wrap">
+        <button class="clear-all" id="clearAll" type="button">CLEAR ALL</button>
+        <div class="clear-confirm" id="clearConfirm" role="dialog" aria-label="Confirm clear all">
+          <strong>You sure?</strong><button class="yes" id="confirmYes" type="button">Yes</button><button id="confirmCancel" type="button">Cancel</button>
+        </div>
+      </div>
+      <button class="settings-button" id="settingsButton" type="button" aria-expanded="false" aria-label="Settings">⚙</button>
+      <aside class="settings-panel" id="settingsPanel">
+        <h2>Settings</h2>
+        <label><input id="requireAnswer" type="checkbox" checked>Require answer</label>
+        <label><input id="giveStats" type="checkbox" checked>Give stats</label>
+        <label><input id="useTimer" type="checkbox" checked>Use timer</label>
+      </aside>
+    </header>
+    <div class="builder-layout" id="builder">
+      <section class="deck-builder">
+        <h1>Make It So</h1><p class="intro">Add terms and answers to create your flashcards.</p>
+        <div class="session-summary hidden" id="sessionSummary"></div>
+        <div class="column-headings" id="columnHeadings"><span>FRONT</span><span>BACK / ANSWER</span></div>
+        <div id="rows"></div>
+        <div class="begin-row"><button class="begin" id="begin" type="button" disabled>BEGIN</button><span id="beginHelp">Add a front and an answer to begin.</span></div>
+      </section>
+    </div>
+  </main>
+
+  <main class="study-screen" id="studyScreen">
+    <header class="study-top"><span class="mini-brand">FLASH CARDS</span><div class="timer" id="timer">00:00</div><span class="card-count" id="cardCount"></span></header>
+    <section class="study-workspace">
+      <div class="prompt-card" id="promptCard"></div>
+      <form class="answer-row" id="answerForm">
+        <div class="answer-side"><label for="studyAnswer">YOUR ANSWER</label><input id="studyAnswer" placeholder="Type your answer and press Enter" autocomplete="off"></div>
+        <div class="answer-side revealed-answer" id="revealedAnswer"><label>ANSWER</label><div id="correctAnswer"></div></div>
+      </form>
+      <p class="space-hint" id="nextHint">Press Enter for the next card</p>
+    </section>
+    <button class="end-session" id="endSession" type="button">END SESSION</button>
+  </main>
+
+  <script>
+    (()=>{
+      const $=id=>document.getElementById(id);let nextId=1,cards=[blankCard()],stats={},queue=[],queueIndex=0,revealed=false,elapsed=0,timerId=null,draggedId=null;
+      function blankCard(){return{id:String(nextId++),front:'',back:''}}
+      function completeCards(){return cards.filter(card=>card.front.trim()&&card.back.trim())}
+      function normalize(value){return value.trim().toLocaleLowerCase()}
+      function shuffle(items){const copy=[...items];for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]]}return copy}
+      function escapeHtml(value){return value.replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[char]))}
+      function ensureBlank(){const nonblank=cards.filter(card=>card.front||card.back);const blank=cards.find(card=>!card.front&&!card.back)||blankCard();cards=[...nonblank,blank]}
+      function syncHeight(row){const fields=[...row.querySelectorAll('textarea')];fields.forEach(field=>field.style.height='0px');const height=Math.max(58,...fields.map(field=>field.scrollHeight));fields.forEach(field=>field.style.height=height+'px')}
+      function renderRows(){
+        const showStats=$('columnHeadings').classList.contains('has-stat');$('rows').innerHTML='';
+        cards.forEach((card,index)=>{const row=document.createElement('div');row.className='card-row'+(showStats?' has-stat':'');row.dataset.id=card.id;
+          const stat=stats[card.id];const percent=stat&&stat.total?Math.round(stat.correct/stat.total*100):0;
+          row.innerHTML=`<div class="row-tools"><button class="delete-row" type="button" aria-label="Delete card ${index+1}">×</button><button class="drag-handle" type="button" draggable="${Boolean(card.front||card.back)}" aria-label="Reorder card ${index+1}. Use arrow keys to move." title="Drag to reorder">⠿</button><span class="row-number">${index+1}</span></div><textarea data-card-input data-key="front" aria-label="Front of card ${index+1}" placeholder="Type the front…">${escapeHtml(card.front)}</textarea><textarea data-card-input data-key="back" aria-label="Answer for card ${index+1}" placeholder="Type the answer…">${escapeHtml(card.back)}</textarea>${showStats?`<div class="row-stat">${stat?`<strong>${stat.correct}/${stat.total}</strong><span>= ${percent}% correct</span>`:'<span>Not seen</span>'}</div>`:''}`;
+          row.querySelector('.delete-row').onclick=()=>{cards=cards.filter(item=>item.id!==card.id);ensureBlank();renderRows();updateBegin()};
+          const handle=row.querySelector('.drag-handle');handle.addEventListener('dragstart',()=>draggedId=card.id);handle.addEventListener('keydown',event=>{if(event.key==='ArrowUp')nudge(card.id,-1);if(event.key==='ArrowDown')nudge(card.id,1)});
+          row.addEventListener('dragover',event=>event.preventDefault());row.addEventListener('drop',()=>reorder(draggedId,card.id));
+          row.querySelectorAll('textarea').forEach(field=>{field.addEventListener('input',()=>{card[field.dataset.key]=field.value;syncHeight(row);if(card===cards.at(-1)&&(card.front||card.back)){cards.push(blankCard());renderRows()}updateBegin()});field.addEventListener('keydown',tabBetweenFields)});
+          $('rows').appendChild(row);syncHeight(row);
+        })
+      }
+      function tabBetweenFields(event){if(event.key!=='Tab')return;const fields=[...document.querySelectorAll('textarea[data-card-input]')],index=fields.indexOf(event.currentTarget),next=event.shiftKey?index-1:index+1;if(fields[next]){event.preventDefault();fields[next].focus()}}
+      function nudge(id,delta){const index=cards.findIndex(card=>card.id===id),destination=index+delta;if(index<0||destination<0||destination>=cards.length)return;[cards[index],cards[destination]]=[cards[destination],cards[index]];ensureBlank();renderRows()}
+      function reorder(from,to){if(!from||from===to)return;const fromIndex=cards.findIndex(card=>card.id===from),toIndex=cards.findIndex(card=>card.id===to);if(fromIndex<0||toIndex<0)return;const[moved]=cards.splice(fromIndex,1);cards.splice(toIndex,0,moved);ensureBlank();renderRows()}
+      function updateBegin(){const ready=completeCards().length>0;$('begin').disabled=!ready;$('beginHelp').classList.toggle('hidden',ready)}
+      function begin(){const complete=completeCards();if(!complete.length)return;stats={};queue=shuffle(complete);queueIndex=0;elapsed=0;revealed=false;$('builderScreen').classList.add('hidden');$('studyScreen').classList.add('active');$('sessionSummary').classList.add('hidden');$('columnHeadings').classList.remove('has-stat');stopTimer();if($('useTimer').checked){$('timer').classList.remove('hidden');timerId=setInterval(()=>{elapsed++;renderTimer()},1000)}else $('timer').classList.add('hidden');showCard()}
+      function showCard(){revealed=false;$('promptCard').textContent=queue[queueIndex].front;$('cardCount').textContent=`Card ${queueIndex+1} of ${queue.length}`;$('studyAnswer').value='';$('studyAnswer').disabled=false;$('studyAnswer').className='';$('revealedAnswer').style.display='none';$('revealedAnswer').classList.remove('correct-text');$('nextHint').style.display='none';requestAnimationFrame(()=>$('studyAnswer').focus())}
+      function submit(){if(revealed)return nextCard();const card=queue[queueIndex],answer=$('studyAnswer').value,requires=$('requireAnswer').checked;revealed=true;$('studyAnswer').disabled=true;$('correctAnswer').textContent=card.back;$('revealedAnswer').style.display='block';if(requires){const correct=normalize(answer)===normalize(card.back);$('studyAnswer').classList.add(correct?'correct':'wrong');$('revealedAnswer').classList.toggle('correct-text',correct);const current=stats[card.id]||{correct:0,total:0};current.total++;if(correct)current.correct++;stats[card.id]=current}$('nextHint').style.display='block'}
+      function nextCard(){queueIndex++;if(queueIndex>=queue.length){queue=shuffle(queue);queueIndex=0}showCard()}
+      function endSession(){stopTimer();$('studyScreen').classList.remove('active');$('builderScreen').classList.remove('hidden');if($('giveStats').checked){const totals=Object.values(stats).reduce((sum,stat)=>({correct:sum.correct+stat.correct,total:sum.total+stat.total}),{correct:0,total:0}),wrong=totals.total-totals.correct,percent=totals.total?Math.round(totals.correct/totals.total*100):0;$('sessionSummary').innerHTML=`<span><strong>${totals.correct}</strong> correct</span><span><strong>${wrong}</strong> wrong</span><span><strong>${percent}%</strong> correct overall</span>`;$('sessionSummary').classList.remove('hidden');$('columnHeadings').classList.add('has-stat');$('columnHeadings').innerHTML='<span>FRONT</span><span>BACK / ANSWER</span><span>SESSION RESULTS</span>'}else{$('sessionSummary').classList.add('hidden');$('columnHeadings').classList.remove('has-stat');$('columnHeadings').innerHTML='<span>FRONT</span><span>BACK / ANSWER</span>'}renderRows()}
+      function stopTimer(){if(timerId)clearInterval(timerId);timerId=null}function renderTimer(){const minutes=Math.floor(elapsed/60),seconds=elapsed%60;$('timer').textContent=String(minutes).padStart(2,'0')+':'+String(seconds).padStart(2,'0')}
+      $('clearAll').onclick=()=>$('clearConfirm').classList.add('open');$('confirmCancel').onclick=()=>$('clearConfirm').classList.remove('open');$('confirmYes').onclick=()=>{cards=[blankCard()];stats={};$('clearConfirm').classList.remove('open');$('sessionSummary').classList.add('hidden');$('columnHeadings').classList.remove('has-stat');$('columnHeadings').innerHTML='<span>FRONT</span><span>BACK / ANSWER</span>';renderRows();updateBegin()};
+      $('settingsButton').onclick=()=>{const open=$('settingsPanel').classList.toggle('open');$('settingsButton').setAttribute('aria-expanded',String(open))};$('begin').onclick=begin;$('answerForm').onsubmit=event=>{event.preventDefault();submit()};$('endSession').onclick=endSession;window.addEventListener('keydown',event=>{if($('studyScreen').classList.contains('active')&&revealed&&event.key==='Enter'){event.preventDefault();nextCard()}});renderRows();updateBegin();
+    })();
+  </script>
+</body>
+</html>
+
+
 

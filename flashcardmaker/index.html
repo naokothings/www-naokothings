@@ -32,6 +32,7 @@
         <label><input id="requireAnswer" type="checkbox" checked>Require answer</label>
         <label><input id="giveStats" type="checkbox" checked>Give stats</label>
         <label><input id="useTimer" type="checkbox" checked>Use timer</label>
+        <label><input id="goInOrder" type="checkbox">Go in order</label>
       </aside>
     </header>
     <div class="builder-layout" id="builder">
@@ -60,7 +61,7 @@
 
   <script>
     (()=>{
-      const $=id=>document.getElementById(id);let nextId=1,cards=[blankCard()],stats={},queue=[],queueIndex=0,revealed=false,elapsed=0,timerId=null,draggedId=null;
+      const $=id=>document.getElementById(id);let nextId=1,cards=[blankCard()],stats={},queue=[],queueIndex=0,revealed=false,elapsed=0,timerId=null,draggedId=null,orderedSession=false;
       function blankCard(){return{id:String(nextId++),front:'',back:''}}
       function completeCards(){return cards.filter(card=>card.front.trim()&&card.back.trim())}
       function normalize(value){return value.trim().toLocaleLowerCase()}
@@ -76,7 +77,7 @@
           row.querySelector('.delete-row').onclick=()=>{cards=cards.filter(item=>item.id!==card.id);ensureBlank();renderRows();updateBegin()};
           const handle=row.querySelector('.drag-handle');handle.addEventListener('dragstart',()=>draggedId=card.id);handle.addEventListener('keydown',event=>{if(event.key==='ArrowUp')nudge(card.id,-1);if(event.key==='ArrowDown')nudge(card.id,1)});
           row.addEventListener('dragover',event=>event.preventDefault());row.addEventListener('drop',()=>reorder(draggedId,card.id));
-          row.querySelectorAll('textarea').forEach(field=>{field.addEventListener('input',()=>{card[field.dataset.key]=field.value;syncHeight(row);if(card===cards.at(-1)&&(card.front||card.back)){cards.push(blankCard());renderRows()}updateBegin()});field.addEventListener('keydown',tabBetweenFields)});
+          row.querySelectorAll('textarea').forEach(field=>{field.addEventListener('input',()=>{card[field.dataset.key]=field.value;syncHeight(row);if(card===cards.at(-1)&&(card.front||card.back)){const key=field.dataset.key,start=field.selectionStart,end=field.selectionEnd;cards.push(blankCard());renderRows();const replacement=document.querySelector(`.card-row[data-id="${card.id}"] textarea[data-key="${key}"]`);if(replacement){replacement.focus();replacement.setSelectionRange(start,end)}}updateBegin()});field.addEventListener('keydown',tabBetweenFields)});
           $('rows').appendChild(row);syncHeight(row);
         })
       }
@@ -84,10 +85,10 @@
       function nudge(id,delta){const index=cards.findIndex(card=>card.id===id),destination=index+delta;if(index<0||destination<0||destination>=cards.length)return;[cards[index],cards[destination]]=[cards[destination],cards[index]];ensureBlank();renderRows()}
       function reorder(from,to){if(!from||from===to)return;const fromIndex=cards.findIndex(card=>card.id===from),toIndex=cards.findIndex(card=>card.id===to);if(fromIndex<0||toIndex<0)return;const[moved]=cards.splice(fromIndex,1);cards.splice(toIndex,0,moved);ensureBlank();renderRows()}
       function updateBegin(){const ready=completeCards().length>0;$('begin').disabled=!ready;$('beginHelp').classList.toggle('hidden',ready)}
-      function begin(){const complete=completeCards();if(!complete.length)return;stats={};queue=shuffle(complete);queueIndex=0;elapsed=0;revealed=false;$('builderScreen').classList.add('hidden');$('studyScreen').classList.add('active');$('sessionSummary').classList.add('hidden');$('columnHeadings').classList.remove('has-stat');stopTimer();if($('useTimer').checked){$('timer').classList.remove('hidden');timerId=setInterval(()=>{elapsed++;renderTimer()},1000)}else $('timer').classList.add('hidden');showCard()}
+      function begin(){const complete=completeCards();if(!complete.length)return;stats={};orderedSession=$('goInOrder').checked;queue=orderedSession?[...complete]:shuffle(complete);queueIndex=0;elapsed=0;revealed=false;$('builderScreen').classList.add('hidden');$('studyScreen').classList.add('active');$('sessionSummary').classList.add('hidden');$('columnHeadings').classList.remove('has-stat');stopTimer();if($('useTimer').checked){$('timer').classList.remove('hidden');timerId=setInterval(()=>{elapsed++;renderTimer()},1000)}else $('timer').classList.add('hidden');showCard()}
       function showCard(){revealed=false;$('promptCard').textContent=queue[queueIndex].front;$('cardCount').textContent=`Card ${queueIndex+1} of ${queue.length}`;$('studyAnswer').value='';$('studyAnswer').disabled=false;$('studyAnswer').className='';$('revealedAnswer').style.display='none';$('revealedAnswer').classList.remove('correct-text');$('nextHint').style.display='none';requestAnimationFrame(()=>$('studyAnswer').focus())}
       function submit(){if(revealed)return nextCard();const card=queue[queueIndex],answer=$('studyAnswer').value,requires=$('requireAnswer').checked;revealed=true;$('studyAnswer').disabled=true;$('correctAnswer').textContent=card.back;$('revealedAnswer').style.display='block';if(requires){const correct=normalize(answer)===normalize(card.back);$('studyAnswer').classList.add(correct?'correct':'wrong');$('revealedAnswer').classList.toggle('correct-text',correct);const current=stats[card.id]||{correct:0,total:0};current.total++;if(correct)current.correct++;stats[card.id]=current}$('nextHint').style.display='block'}
-      function nextCard(){queueIndex++;if(queueIndex>=queue.length){queue=shuffle(queue);queueIndex=0}showCard()}
+      function nextCard(){queueIndex++;if(queueIndex>=queue.length){if(!orderedSession)queue=shuffle(queue);queueIndex=0}showCard()}
       function endSession(){stopTimer();$('studyScreen').classList.remove('active');$('builderScreen').classList.remove('hidden');if($('giveStats').checked){const totals=Object.values(stats).reduce((sum,stat)=>({correct:sum.correct+stat.correct,total:sum.total+stat.total}),{correct:0,total:0}),wrong=totals.total-totals.correct,percent=totals.total?Math.round(totals.correct/totals.total*100):0;$('sessionSummary').innerHTML=`<span><strong>${totals.correct}</strong> correct</span><span><strong>${wrong}</strong> wrong</span><span><strong>${percent}%</strong> correct overall</span>`;$('sessionSummary').classList.remove('hidden');$('columnHeadings').classList.add('has-stat');$('columnHeadings').innerHTML='<span>FRONT</span><span>BACK / ANSWER</span><span>SESSION RESULTS</span>'}else{$('sessionSummary').classList.add('hidden');$('columnHeadings').classList.remove('has-stat');$('columnHeadings').innerHTML='<span>FRONT</span><span>BACK / ANSWER</span>'}renderRows()}
       function stopTimer(){if(timerId)clearInterval(timerId);timerId=null}function renderTimer(){const minutes=Math.floor(elapsed/60),seconds=elapsed%60;$('timer').textContent=String(minutes).padStart(2,'0')+':'+String(seconds).padStart(2,'0')}
       $('clearAll').onclick=()=>$('clearConfirm').classList.add('open');$('confirmCancel').onclick=()=>$('clearConfirm').classList.remove('open');$('confirmYes').onclick=()=>{cards=[blankCard()];stats={};$('clearConfirm').classList.remove('open');$('sessionSummary').classList.add('hidden');$('columnHeadings').classList.remove('has-stat');$('columnHeadings').innerHTML='<span>FRONT</span><span>BACK / ANSWER</span>';renderRows();updateBegin()};
@@ -96,6 +97,3 @@
   </script>
 </body>
 </html>
-
-
-

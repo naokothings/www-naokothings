@@ -27,14 +27,14 @@
 
         h1 {
             font-size: 48pt;
-            margin: 0 0 5px 0;
+            margin: 0 0 20px 0; /* Breathing room restored! */
             text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.4);
         }
 
         /* Smaller, normal-sized subtitle */
         .subtitle {
             text-align: center;
-            font-size: 1.1rem; /* Standard text size */
+            font-size: 1.1rem;
             line-height: 1.5;
             margin-bottom: 40px;
             color: #333;
@@ -73,11 +73,17 @@
             transform: scale(0.95); /* The "Squish" */
         }
 
+        /* Restored original tile image behavior */
         .tile img {
-            height: 250px;
+            height: 285px;
             width: auto;
             display: block;
-            border-radius: 20px; /* Applying rounding to all for consistency */
+        }
+
+        /* Custom sizing rule to keep Katakana unclipped */
+        .katakana-img {
+            height: 250px !important; 
+            border-radius: 20px;
             box-shadow: -10px 10px 20px rgba(0, 0, 0, 0.3);
         }
     </style>
@@ -105,7 +111,7 @@
         </a>
 
         <a href="https://www.justnaokothings.com/katakana" class="tile">
-            <img src="index_files/katakana_thumbnail.png" alt="katakana">
+            <img src="index_files/katakana_thumbnail.png" alt="katakana" class="katakana-img">
         </a>
 
         <a href="https://www.justnaokothings.com/flashcardmaker" class="tile">

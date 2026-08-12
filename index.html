@@ -3,19 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <title>NAOKO!</title>
     <link rel="icon" href="https://fav.farm/✨">
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             background-image: url('index_files/background.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
-            background-color: #FFECBC; 
-            
+            background-color: #FFECBC;
+
             font-family: "Avenir Book", "Aptos", sans-serif;
             margin: 0;
             display: flex;
@@ -27,11 +31,10 @@
 
         h1 {
             font-size: 48pt;
-            margin: 0 0 20px 0; /* Breathing room restored! */
+            margin: 0 0 20px 0;
             text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.4);
         }
 
-        /* Smaller, normal-sized subtitle */
         .subtitle {
             text-align: center;
             font-size: 1.1rem;
@@ -40,13 +43,12 @@
             color: #333;
         }
 
-        /* Styling only the specific clickable part */
         .audio-link {
             cursor: pointer;
             font-weight: bold;
             text-decoration: underline dotted;
         }
-        
+
         .audio-link:hover {
             color: #d35400;
         }
@@ -70,30 +72,77 @@
         }
 
         .tile:active {
-            transform: scale(0.95); /* The "Squish" */
+            transform: scale(0.95);
         }
 
-        /* Restored original tile image behavior */
         .tile img {
             height: 285px;
             width: auto;
             display: block;
         }
 
-        /* Custom sizing rule to keep Katakana unclipped */
         .katakana-img {
-            height: 250px !important; 
+            height: 250px;
             border-radius: 20px;
             box-shadow: -10px 10px 20px rgba(0, 0, 0, 0.3);
         }
+
+        .notion-section {
+            margin-top: 60px;
+            text-align: center;
+        }
+
+        .notion-section h2 {
+            font-size: 24pt;
+            margin: 0 0 25px 0;
+            font-weight: normal;
+        }
+
+        .notion-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+        }
+
+        .notion-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #333;
+            font-size: 0.9rem;
+            transition: transform 0.2s ease;
+        }
+
+        .notion-item:hover {
+            transform: translateY(-4px);
+        }
+
+        .notion-item:active {
+            transform: scale(0.95);
+        }
+
+        .notion-item img {
+            height: 200px;
+            width: auto;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .notion-item:hover span {
+            text-decoration: underline;
+        }
     </style>
 </head>
+
 <body>
 
     <h1>Just Naoko Things</h1>
 
     <div class="subtitle">
-        It's pronounced <span class="audio-link" onclick="playAudio()">NOW*ko 🔈</span><br>
+        It's pronounced
+        <span class="audio-link" onclick="playAudio()">NOW*ko 🔈</span><br>
         Don't panic. You got this.
     </div>
 
@@ -102,26 +151,53 @@
     </audio>
 
     <div class="gallery">
+
         <a href="https://www.instagram.com/carrotthedoggie" class="tile">
             <img src="index_files/carrot_thumbnail.png" alt="Carrot the dog">
         </a>
 
-        <a href="https://www.justnaokothings.com/clippy/" class="tile">
+        <a href="/clippy/" class="tile">
             <img src="index_files/clippy_thumbnail.png" alt="Clippy">
         </a>
 
-        <a href="https://www.justnaokothings.com/katakana" class="tile">
-            <img src="index_files/katakana_thumbnail.png" alt="katakana" class="katakana-img">
+        <a href="/katakana/" class="tile">
+            <img
+                src="index_files/katakana_thumbnail.png"
+                alt="Katakana"
+                class="katakana-img"
+            >
         </a>
 
-        <a href="https://www.justnaokothings.com/flashcardmaker" class="tile">
-            <img src="index_files/indexcard.png" alt="Flash Card Maker">
+        <a href="/flashcardmaker/" class="tile">
+            <img
+                src="index_files/indexcard.png"
+                alt="Flash Card Maker"
+            >
         </a>
+
     </div>
+
+    <section class="notion-section">
+
+        <h2>Notion Templates</h2>
+
+        <div class="notion-gallery">
+
+            <a href="/after/" class="notion-item">
+                <img
+                    src="index_files/funeral.png"
+                    alt="Post-Life Planning"
+                >
+                <span>Post-Life Planning</span>
+            </a>
+
+        </div>
+
+    </section>
 
     <script>
         function playAudio() {
-            var audio = document.getElementById("naokoAudio");
+            const audio = document.getElementById("naokoAudio");
             audio.play();
         }
     </script>
